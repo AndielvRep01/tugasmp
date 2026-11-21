@@ -1,0 +1,4236 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lab Andiel - TKJ Educational Game Platform</title>
+  <style>
+    :root {
+      /* Playful Neo-Cartoon & Retro Arcade Comic Theme */
+      --bg: #181126;
+      --bg-alt: #221738;
+      --panel: #271a3f;
+      --panel2: #1e1432;
+      --panel-header: #322152;
+      --border: #000000;
+      --border2: #000000;
+      --shadow-comic: 4px 4px 0px #000000;
+      --shadow-comic-lg: 6px 6px 0px #000000;
+      --shadow-comic-sm: 2px 2px 0px #000000;
+
+      /* Vibrant Cartoon Palette: Sunshine Yellow, Candy Coral, Mint Lime, Lavender Sky */
+      --yellow: #ffd166;
+      --coral: #ff477e;
+      --mint: #06d6a0;
+      --lavender: #b588ff;
+      --cyan: #38bdf8;
+      --amber: #fbbf24;
+      --red: #f43f5e;
+      --green: #22c55e;
+
+      /* High-Contrast Readability */
+      --text: #ffffff;
+      --text-muted: #d4c8eb;
+      --text-dim: #9b89b8;
+
+      /* UI Metrics */
+      --header-h: 64px;
+      --tab-h: 56px;
+      --radius: 12px;
+      --radius-sm: 8px;
+      --radius-lg: 16px;
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      font-size: 14px;
+      line-height: 1.6;
+      overflow-x: hidden;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      /* Playful comic halftone polka-dot background - NOT blue! */
+      background-image:
+        radial-gradient(circle at 10% 20%, rgba(255, 71, 126, 0.16) 0%, transparent 40%),
+        radial-gradient(circle at 90% 85%, rgba(255, 209, 102, 0.16) 0%, transparent 45%),
+        radial-gradient(circle at 50% 50%, rgba(181, 136, 255, 0.12) 0%, transparent 50%),
+        radial-gradient(#ffd166 1.8px, transparent 1.8px);
+      background-size: 100% 100%, 100% 100%, 100% 100%, 28px 28px;
+      background-attachment: fixed;
+    }
+
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #120d20;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--yellow);
+      border: 2px solid #000;
+      border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #ffe066;
+    }
+
+    *:focus-visible {
+      outline: 3px solid var(--yellow);
+      outline-offset: 2px;
+    }
+
+    button,
+    input,
+    select {
+      font-family: inherit;
+      font-size: inherit;
+    }
+
+    /* ============================================
+       HEADER (CARTOON HUD)
+    ============================================ */
+    #app-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: var(--header-h);
+      background: #201535;
+      border-bottom: 3px solid #000000;
+      box-shadow: 0 4px 0px rgba(0, 0, 0, 0.6);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 0 20px;
+      z-index: 100;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+    }
+
+    .header-logo {
+      font-weight: 900;
+      font-size: 16px;
+      color: #150d24;
+      background: var(--yellow);
+      padding: 6px 14px;
+      border-radius: 10px;
+      border: 2px solid #000000;
+      box-shadow: var(--shadow-comic-sm);
+      letter-spacing: -0.3px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+      flex-shrink: 0;
+      transform: rotate(-1deg);
+    }
+
+    .header-logo span {
+      color: var(--coral);
+      font-weight: 900;
+    }
+
+    .header-sep {
+      width: 2px;
+      height: 28px;
+      background: #000000;
+      flex-shrink: 0;
+    }
+
+    .header-level {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      min-width: 175px;
+      flex-shrink: 0;
+    }
+
+    .header-level-label {
+      font-size: 11px;
+      color: var(--yellow);
+      white-space: nowrap;
+      font-weight: 900;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      text-shadow: 1px 1px 0px #000000;
+    }
+
+    .xp-bar-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .xp-bar {
+      width: 110px;
+      height: 10px;
+      background: #120b1f;
+      border: 2px solid #000000;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: inset 1px 1px 0px rgba(0, 0, 0, 0.6);
+    }
+
+    .xp-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #ff9f1c, var(--yellow), var(--mint));
+      border-radius: 20px;
+      transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .xp-text {
+      font-size: 11px;
+      color: var(--text-muted);
+      white-space: nowrap;
+      font-family: 'JetBrains Mono', Consolas, monospace;
+      font-weight: 800;
+    }
+
+    .header-stat {
+      font-size: 12px;
+      color: var(--text);
+      white-space: nowrap;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: #2e1f49;
+      padding: 5px 12px;
+      border-radius: 8px;
+      border: 2px solid #000000;
+      box-shadow: var(--shadow-comic-sm);
+      font-weight: 700;
+    }
+
+    .header-stat strong {
+      color: var(--yellow);
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    .header-spacer {
+      flex: 1;
+    }
+
+    .btn-icon {
+      background: #2e1f49;
+      border: 2px solid #000000;
+      color: var(--text);
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.12s ease;
+      box-shadow: var(--shadow-comic-sm);
+      flex-shrink: 0;
+      font-size: 15px;
+    }
+
+    .btn-icon:hover {
+      background: var(--yellow);
+      color: #120d20;
+      transform: translate(-1px, -1px);
+      box-shadow: 3px 3px 0px #000000;
+    }
+
+    .btn-icon:active {
+      transform: translate(2px, 2px);
+      box-shadow: 0px 0px 0px #000000;
+    }
+
+    /* ============================================
+       TAB NAV (CARTOON ARCADE TABS)
+    ============================================ */
+    #tab-nav {
+      position: fixed;
+      top: var(--header-h);
+      left: 0;
+      right: 0;
+      height: var(--tab-h);
+      background: #1b122e;
+      border-bottom: 3px solid #000000;
+      box-shadow: 0 4px 0px rgba(0, 0, 0, 0.4);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      overflow-x: auto;
+      z-index: 90;
+      scrollbar-width: none;
+      padding: 0 16px;
+    }
+
+    #tab-nav::-webkit-scrollbar {
+      display: none;
+    }
+
+    .tab-btn {
+      flex-shrink: 0;
+      padding: 8px 16px;
+      height: 38px;
+      background: #2b1c45;
+      border: 2px solid #000000;
+      border-radius: 10px;
+      color: #dfd4f5;
+      cursor: pointer;
+      white-space: nowrap;
+      font-size: 13px;
+      font-weight: 800;
+      box-shadow: var(--shadow-comic-sm);
+      transition: all 0.12s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 44px;
+    }
+
+    .tab-btn:hover {
+      background: #392659;
+      color: #ffffff;
+      transform: translate(-1px, -1px);
+      box-shadow: 3px 3px 0px #000000;
+    }
+
+    .tab-btn.active {
+      background: var(--yellow);
+      color: #150d24;
+      border-color: #000000;
+      box-shadow: 3px 3px 0px #000000;
+      transform: translateY(-2px);
+    }
+
+    /* ============================================
+       MAIN CONTENT
+    ============================================ */
+    #main {
+      margin-top: calc(var(--header-h) + var(--tab-h));
+      padding: 24px 20px;
+      max-width: 1140px;
+      margin-left: auto;
+      margin-right: auto;
+      padding-top: calc(var(--header-h) + var(--tab-h) + 24px);
+    }
+
+    .game-panel {
+      display: none;
+    }
+
+    .game-panel.active {
+      display: block;
+      animation: popIn 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    @keyframes popIn {
+      from {
+        opacity: 0;
+        transform: scale(0.98) translateY(6px);
+      }
+
+      to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+
+    /* ============================================
+       SHARED COMPONENTS (NEO-CARTOON STYLE)
+    ============================================ */
+    .panel-box {
+      background: var(--panel);
+      border: 3px solid #000000;
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-comic-lg);
+      overflow: hidden;
+      margin-bottom: 20px;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .panel-header {
+      padding: 13px 20px;
+      border-bottom: 3px solid #000000;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      background: var(--panel-header);
+    }
+
+    .panel-title {
+      font-size: 13px;
+      font-weight: 900;
+      color: var(--yellow);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-shadow: 1px 1px 0px #000000;
+    }
+
+    .panel-body {
+      padding: 20px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 0 20px;
+      height: 42px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+      border: 2px solid #000000;
+      box-shadow: var(--shadow-comic);
+      white-space: nowrap;
+      min-width: 44px;
+      transition: all 0.12s ease;
+      letter-spacing: 0.3px;
+    }
+
+    .btn:hover {
+      transform: translate(-1px, -1px);
+      box-shadow: 5px 5px 0px #000000;
+    }
+
+    .btn:active {
+      transform: translate(2px, 2px);
+      box-shadow: 1px 1px 0px #000000;
+    }
+
+    .btn-primary {
+      background: var(--yellow);
+      color: #150d24;
+    }
+
+    .btn-primary:hover {
+      background: #ffe066;
+    }
+
+    .btn-secondary {
+      background: #392857;
+      color: #ffffff;
+      border-color: #000000;
+    }
+
+    .btn-secondary:hover {
+      background: #47326d;
+    }
+
+    .btn-danger {
+      background: var(--coral);
+      color: #ffffff;
+    }
+
+    .btn-danger:hover {
+      background: #ff6592;
+    }
+
+    .btn-success {
+      background: var(--mint);
+      color: #04241b;
+    }
+
+    .btn-success:hover {
+      background: #34e0b5;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0.4px;
+      border: 2px solid #000000;
+      box-shadow: var(--shadow-comic-sm);
+    }
+
+    .badge-green {
+      background: var(--mint);
+      color: #04261d;
+    }
+
+    .badge-red {
+      background: var(--coral);
+      color: #ffffff;
+    }
+
+    .badge-amber {
+      background: var(--yellow);
+      color: #180f2b;
+    }
+
+    .badge-cyan {
+      background: var(--lavender);
+      color: #150b28;
+    }
+
+    .lives {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .life-icon {
+      font-size: 18px;
+      transition: all 0.2s ease;
+      filter: drop-shadow(2px 2px 0px #000000);
+    }
+
+    .life-icon.lost {
+      opacity: 0.2;
+      filter: grayscale(1);
+    }
+
+    .timer-display {
+      font-family: 'JetBrains Mono', Consolas, monospace;
+      font-size: 18px;
+      font-weight: 900;
+      color: #150d24;
+      background: var(--yellow);
+      border: 2px solid #000000;
+      box-shadow: var(--shadow-comic-sm);
+      padding: 4px 14px;
+      border-radius: 8px;
+      letter-spacing: 2px;
+    }
+
+    .timer-display.urgent {
+      background: var(--coral);
+      color: #ffffff;
+      animation: comicShake 0.4s ease infinite alternate;
+    }
+
+    @keyframes comicShake {
+      from {
+        transform: rotate(-2deg);
+      }
+
+      to {
+        transform: rotate(2deg);
+      }
+    }
+
+    /* ============================================
+       GAME 1: CLI TROUBLESHOOTER (CARTOON TERMINAL)
+    ============================================ */
+    #cli-topology {
+      width: 100%;
+      height: 98px;
+      overflow: visible;
+    }
+
+    .cli-terminal {
+      background: #110b1d;
+      border: 3px solid #000000;
+      border-radius: var(--radius);
+      box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.8), var(--shadow-comic);
+      padding: 16px 18px;
+      font-family: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+      font-size: 13.5px;
+      line-height: 1.6;
+      min-height: 190px;
+      max-height: 330px;
+      overflow-y: auto;
+      position: relative;
+    }
+
+    .cli-terminal::before {
+      content: "🎮 TKJ_LAB_CONSOLE.SH — v2.0";
+      display: inline-block;
+      background: var(--coral);
+      color: #ffffff;
+      padding: 3px 10px;
+      border-radius: 6px;
+      border: 2px solid #000000;
+      box-shadow: var(--shadow-comic-sm);
+      font-weight: 900;
+      font-size: 10px;
+      margin-bottom: 14px;
+      user-select: none;
+    }
+
+    .terminal-output {
+      color: #d1c5e8;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+
+    .terminal-output .t-green {
+      color: #06d6a0;
+      font-weight: 800;
+    }
+
+    .terminal-output .t-red {
+      color: #ff5964;
+      font-weight: 800;
+    }
+
+    .terminal-output .t-cyan {
+      color: #ffd166;
+      font-weight: 800;
+    }
+
+    .terminal-output .t-amber {
+      color: #fde047;
+      font-weight: 800;
+    }
+
+    .terminal-output .t-white {
+      color: #ffffff;
+      font-weight: 700;
+    }
+
+    .terminal-input-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 14px;
+      background: #1b122c;
+      border: 2px solid #000000;
+      box-shadow: var(--shadow-comic-sm);
+      border-radius: 8px;
+      padding: 8px 14px;
+    }
+
+    .terminal-prompt {
+      color: var(--yellow);
+      font-family: 'JetBrains Mono', Consolas, monospace;
+      font-size: 13.5px;
+      font-weight: 900;
+      white-space: nowrap;
+      user-select: none;
+    }
+
+    .terminal-input {
+      flex: 1;
+      background: none;
+      border: none;
+      outline: none;
+      color: #ffffff;
+      font-family: 'JetBrains Mono', Consolas, monospace;
+      font-size: 13.5px;
+      font-weight: 600;
+      caret-color: var(--yellow);
+    }
+
+    .terminal-input:focus {
+      outline: none;
+    }
+
+    .action-panel {
+      display: none;
+      padding: 16px 20px;
+      border-top: 3px solid #000000;
+      background: #1f1433;
+    }
+
+    .action-panel.visible {
+      display: block;
+    }
+
+    .action-panel-title {
+      font-size: 13px;
+      color: var(--yellow);
+      margin-bottom: 12px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      text-shadow: 1px 1px 0px #000000;
+    }
+
+    .action-opts {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .action-opt {
+      background: #2b1d47;
+      border: 2px solid #000000;
+      box-shadow: var(--shadow-comic-sm);
+      color: #ffffff;
+      padding: 12px 18px;
+      border-radius: 10px;
+      cursor: pointer;
+      text-align: left;
+      font-size: 13.5px;
+      font-weight: 700;
+      min-height: 48px;
+      display: flex;
+      align-items: center;
+      transition: all 0.12s ease;
+    }
+
+    .action-opt:hover {
+      transform: translate(-1px, -1px);
+      box-shadow: 4px 4px 0px #000000;
+      background: #39275a;
+      border-color: var(--yellow);
+    }
+
+    .action-opt.correct {
+      background: var(--mint);
+      color: #04261d;
+      border-color: #000000;
+      font-weight: 900;
+      box-shadow: 4px 4px 0px #000000;
+    }
+
+    .action-opt.wrong {
+      background: var(--coral);
+      color: #ffffff;
+      border-color: #000000;
+      font-weight: 900;
+      box-shadow: 4px 4px 0px #000000;
+    }
+
+    /* ============================================
+       GAME 2: CRIMPING (CARTOON CABLE LAB)
+    ============================================ */
+    .crimp-modes {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      padding: 14px 20px;
+      border-bottom: 3px solid #000000;
+      background: #1e1333;
+    }
+
+    .crimp-mode-btn {
+      padding: 8px 16px;
+      height: 38px;
+      border-radius: 8px;
+      border: 2px solid #000000;
+      box-shadow: var(--shadow-comic-sm);
+      background: #2b1d45;
+      color: #d1c4ea;
+      cursor: pointer;
+      transition: all 0.12s ease;
+      font-size: 13px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .crimp-mode-btn:hover {
+      background: #382659;
+      color: #ffffff;
+      transform: translate(-1px, -1px);
+      box-shadow: 3px 3px 0px #000000;
+    }
+
+    .crimp-mode-btn.active {
+      background: var(--yellow);
+      color: #120a21;
+      border-color: #000000;
+      box-shadow: 3px 3px 0px #000000;
+    }
+
+    .crimp-workspace {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      padding: 20px;
+    }
+
+    @media (max-width: 640px) {
+      .crimp-workspace {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .crimp-side {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      background: #1b122d;
+      padding: 16px;
+      border-radius: var(--radius);
+      border: 2px solid #000000;
+      box-shadow: var(--shadow-comic-sm);
+    }
+
+    .crimp-side-label {
+      font-size: 12px;
+      font-weight: 900;
+      color: var(--yellow);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      text-shadow: 1px 1px 0px #000000;
+    }
+
+    .connector-slots {
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+      gap: 6px;
+    }
+
+    .slot {
+      height: 60px;
+      border-radius: 8px;
+      border: 2px dashed #ff9f1c;
+      background: #130b20;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 9px;
+      font-weight: 800;
+      color: var(--text-dim);
+      transition: all 0.15s ease;
+      position: relative;
+      text-align: center;
+      padding: 4px;
+    }
+
+    .slot::before {
+      content: "";
+      position: absolute;
+      top: 2px;
+      width: 12px;
+      height: 4px;
+      background: #ffd166;
+      border: 1px solid #000;
+      border-radius: 2px;
+    }
+
+    .slot:hover {
+      border-color: var(--yellow);
+      background: #23163a;
+      transform: translateY(-2px);
+    }
+
+    .slot.filled {
+      border-style: solid;
+      border-color: #000000;
+      box-shadow: var(--shadow-comic-sm);
+      background: #25183d;
+    }
+
+    .slot .pin-num {
+      position: absolute;
+      bottom: 2px;
+      font-size: 9px;
+      color: #e5daf7;
+      font-family: 'JetBrains Mono', Consolas, monospace;
+      font-weight: 900;
+    }
+
+    .slot .wire-stripe {
+      width: 100%;
+      height: 8px;
+      border-radius: 3px;
+      border: 1px solid #000;
+      margin-bottom: 2px;
+    }
+
+    .slot .wire-label {
+      font-size: 8px;
+      text-align: center;
+      word-break: break-word;
+      line-height: 1.1;
+      font-weight: 800;
+      color: #ffffff;
+    }
+
+    .wire-tray {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 14px 0;
+    }
+
+    .wire-chip {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      border-radius: 8px;
+      border: 2px solid #000000;
+      box-shadow: var(--shadow-comic-sm);
+      cursor: pointer;
+      background: #2c1e47;
+      transition: all 0.12s ease;
+      font-size: 12.5px;
+      font-weight: 800;
+      min-height: 40px;
+      color: #ffffff;
+    }
+
+    .wire-chip:hover:not(.used) {
+      transform: translate(-1px, -1px);
+      box-shadow: 3px 3px 0px #000000;
+      background: #392659;
+      border-color: var(--yellow);
+    }
+
+    .wire-chip.selected {
+      background: var(--yellow);
+      color: #120b1f;
+      border-color: #000000;
+      box-shadow: 3px 3px 0px #000000;
+    }
+
+    .wire-chip.used {
+      opacity: 0.3;
+      cursor: not-allowed;
+      border-style: dashed;
+    }
+
+    .wire-dot {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      border: 2px solid #000000;
+    }
+
+    .crimp-actions {
+      display: flex;
+      gap: 12px;
+      padding: 0 20px 20px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .cable-tester {
+      padding: 20px;
+      border-top: 3px solid #000000;
+      background: #1e1333;
+    }
+
+    .tester-leds {
+      display: flex;
+      gap: 10px;
+      margin: 14px 0;
+      flex-wrap: wrap;
+    }
+
+    .led {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #2c1d47;
+      border: 3px solid #000000;
+      box-shadow: var(--shadow-comic-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 900;
+      color: #9b89b8;
+      transition: all 0.2s ease;
+      font-family: 'JetBrains Mono', Consolas, monospace;
+    }
+
+    .led.on-green {
+      background: var(--mint);
+      color: #022018;
+      box-shadow: 0 0 16px rgba(6, 214, 160, 0.8), var(--shadow-comic-sm);
+    }
+
+    .led.on-red {
+      background: var(--coral);
+      color: #ffffff;
+      box-shadow: 0 0 16px rgba(255, 71, 126, 0.8), var(--shadow-comic-sm);
+    }
+
+    .led.on-amber {
+      background: var(--yellow);
+      color: #180e28;
+      box-shadow: 0 0 16px rgba(255, 209, 102, 0.8), var(--shadow-comic-sm);
+    }
+
+    .tester-result {
+      font-size: 16px;
+      font-weight: 900;
+      margin-top: 12px;
+      text-shadow: 1px 1px 0px #000000;
+    }
+
+    .tester-result.pass {
+      color: var(--mint);
+    }
+
+    .tester-result.fail {
+      color: var(--coral);
+    }
+
+    .tester-result.cross {
+      color: var(--yellow);
+    }
+
+    /* ============================================
+       GAME 3: SUBNETTING (ARCADE BLITZ)
+    ============================================ */
+    .subnet-question-box {
+      background: var(--yellow);
+      color: #120921;
+      border: 3px solid #000000;
+      box-shadow: var(--shadow-comic);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .subnet-ip {
+      font-family: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+      font-size: 28px;
+      font-weight: 900;
+      color: #120921;
+      letter-spacing: 2px;
+    }
+
+    .subnet-fields {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    @media (max-width: 640px) {
+      .subnet-fields {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .field-label {
+      font-size: 12px;
+      color: var(--yellow);
+      font-weight: 900;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      text-shadow: 1px 1px 0px #000000;
+    }
+
+    .field-input {
+      background: #170e24;
+      border: 2px solid #000000;
+      box-shadow: inset 2px 2px 0px rgba(0, 0, 0, 0.5);
+      color: #ffffff;
+      border-radius: var(--radius-sm);
+      padding: 0 14px;
+      height: 46px;
+      font-family: 'JetBrains Mono', Consolas, monospace;
+      font-size: 15px;
+      font-weight: 700;
+      width: 100%;
+      transition: all 0.15s ease;
+    }
+
+    .field-input:focus {
+      outline: none;
+      border-color: var(--yellow);
+      box-shadow: 0 0 0 3px rgba(255, 209, 102, 0.4);
+      background: #23163a;
+    }
+
+    .field-input.correct {
+      border-color: #000000;
+      background: rgba(6, 214, 160, 0.2);
+      color: #34e0b5;
+    }
+
+    .field-input.wrong {
+      border-color: #000000;
+      background: rgba(255, 71, 126, 0.2);
+      color: #ff7096;
+    }
+
+    .combo-display {
+      font-size: 22px;
+      font-weight: 900;
+      color: var(--yellow);
+      font-family: 'JetBrains Mono', Consolas, monospace;
+      text-shadow: 2px 2px 0px #000000;
+    }
+
+    .explanation-panel {
+      background: #1a102b;
+      border: 2px solid #000000;
+      box-shadow: var(--shadow-comic-sm);
+      border-radius: var(--radius);
+      padding: 18px 20px;
+      font-family: 'JetBrains Mono', Consolas, monospace;
+      font-size: 13px;
+      color: #d1c5e8;
+      white-space: pre-wrap;
+      display: none;
+      line-height: 1.7;
+    }
+
+    .explanation-panel.visible {
+      display: block;
+    }
+
+    .binary-table {
+      display: none;
+      border-top: 3px solid #000000;
+      padding: 20px;
+      background: #1d1230;
+    }
+
+    .binary-table.visible {
+      display: block;
+    }
+
+    .binary-row {
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+
+    .bit-cell {
+      text-align: center;
+      font-family: 'JetBrains Mono', Consolas, monospace;
+      font-size: 13px;
+      padding: 7px 2px;
+      border-radius: 6px;
+      border: 2px solid #000000;
+      box-shadow: 1px 1px 0px #000000;
+    }
+
+    .bit-cell.header {
+      color: #ffffff;
+      background: #352157;
+      font-weight: 800;
+      font-size: 11px;
+    }
+
+    .bit-cell.value {
+      color: #150d24;
+      background: var(--yellow);
+      font-weight: 900;
+    }
+
+    .cidr-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: 'JetBrains Mono', Consolas, monospace;
+      font-size: 12.5px;
+      margin-top: 14px;
+      border: 2px solid #000000;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .cidr-table th {
+      text-align: left;
+      padding: 9px 12px;
+      background: #352157;
+      color: var(--yellow);
+      border-bottom: 2px solid #000000;
+      font-size: 11px;
+      text-transform: uppercase;
+      font-weight: 900;
+    }
+
+    .cidr-table td {
+      padding: 8px 12px;
+      color: #ffffff;
+      background: #201335;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      font-weight: 600;
+    }
+
+    .cidr-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .cidr-table tr:hover td {
+      background: #2f1d4f;
+    }
+
+    .subnet-timer-bar {
+      height: 10px;
+      background: #140c21;
+      border: 2px solid #000000;
+      border-radius: 20px;
+      overflow: hidden;
+      margin-bottom: 14px;
+    }
+
+    .subnet-timer-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #ff477e, var(--yellow), var(--mint));
+      border-radius: 20px;
+      transition: width 1s linear, background 0.3s ease;
+    }
+
+    /* ============================================
+       GAME 4: LINUX DEFENSE (CARTOON SYSADMIN)
+    ============================================ */
+    .server-hp-bar {
+      height: 16px;
+      background: #140d21;
+      border: 2px solid #000000;
+      border-radius: 20px;
+      overflow: hidden;
+      flex: 1;
+      box-shadow: var(--shadow-comic-sm);
+    }
+
+    .server-hp-fill {
+      height: 100%;
+      border-radius: 20px;
+      transition: width 0.5s ease, background 0.3s ease;
+      background: linear-gradient(90deg, #ff477e, var(--yellow), var(--mint));
+    }
+
+    .linux-layout {
+      display: grid;
+      grid-template-columns: 1fr 260px;
+      gap: 18px;
+    }
+
+    @media (max-width: 768px) {
+      .linux-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .attack-log {
+      background: #100b1d;
+      border: 3px solid #000000;
+      box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.8), var(--shadow-comic-sm);
+      border-radius: var(--radius);
+      font-family: 'JetBrains Mono', Consolas, monospace;
+      font-size: 12.5px;
+      height: 290px;
+      overflow-y: auto;
+      padding: 14px;
+      line-height: 1.7;
+    }
+
+    .log-entry {
+      padding: 3px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+
+    .log-entry.crit {
+      color: #ff5964;
+      font-weight: 800;
+    }
+
+    .log-entry.warn {
+      color: var(--yellow);
+      font-weight: 800;
+    }
+
+    .log-entry.info {
+      color: #06d6a0;
+      font-weight: 700;
+    }
+
+    .log-entry.sys {
+      color: #b588ff;
+      font-weight: 700;
+    }
+
+    .quick-cmds {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .quick-cmd-btn {
+      background: #2b1d47;
+      border: 2px solid #000000;
+      box-shadow: var(--shadow-comic-sm);
+      color: #ffffff;
+      padding: 10px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      text-align: left;
+      font-family: 'JetBrains Mono', Consolas, monospace;
+      font-size: 12.5px;
+      font-weight: 800;
+      transition: all 0.12s ease;
+      min-height: 40px;
+    }
+
+    .quick-cmd-btn:hover {
+      background: var(--mint);
+      color: #04241b;
+      transform: translate(-1px, -1px);
+      box-shadow: 3px 3px 0px #000000;
+    }
+
+    .linux-terminal-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .linux-input {
+      flex: 1;
+      background: #170d26;
+      border: 2px solid #000000;
+      box-shadow: inset 1px 1px 0px rgba(0, 0, 0, 0.5);
+      color: #ffffff;
+      border-radius: var(--radius-sm);
+      padding: 0 14px;
+      height: 42px;
+      font-family: 'JetBrains Mono', Consolas, monospace;
+      font-size: 13.5px;
+      font-weight: 700;
+      transition: all 0.15s ease;
+    }
+
+    .linux-input:focus {
+      outline: none;
+      border-color: var(--yellow);
+      box-shadow: 0 0 0 3px rgba(255, 209, 102, 0.4);
+    }
+
+    .active-rules-panel {
+      background: #120b1f;
+      border: 2px solid #000000;
+      box-shadow: var(--shadow-comic-sm);
+      border-radius: var(--radius-sm);
+      padding: 10px 14px;
+      font-family: 'JetBrains Mono', Consolas, monospace;
+      font-size: 12.5px;
+      min-height: 44px;
+      max-height: 110px;
+      overflow-y: auto;
+      color: var(--mint);
+      font-weight: 700;
+    }
+
+    .wave-indicator {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .wave-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #170f26;
+      border: 2px solid #000000;
+      transition: all 0.2s ease;
+    }
+
+    .wave-dot.active {
+      background: var(--yellow);
+      transform: scale(1.25);
+    }
+
+    .wave-dot.done {
+      background: var(--mint);
+    }
+
+    /* ============================================
+       GAME 5: QUIZ (CARTOON ARCADE QUIZ)
+    ============================================ */
+    .quiz-question-box {
+      background: #2b1d47;
+      border: 3px solid #000000;
+      box-shadow: var(--shadow-comic);
+      border-radius: var(--radius-lg);
+      padding: 30px 24px;
+      text-align: center;
+      font-size: 18px;
+      font-weight: 800;
+      line-height: 1.6;
+      margin-bottom: 20px;
+      min-height: 110px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+    }
+
+    .quiz-options {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+
+    @media (max-width: 480px) {
+      .quiz-options {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .quiz-opt {
+      background: #25183d;
+      border: 3px solid #000000;
+      box-shadow: var(--shadow-comic);
+      color: #ffffff;
+      padding: 14px 18px;
+      border-radius: var(--radius);
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.12s ease;
+      font-size: 14.5px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-height: 58px;
+      line-height: 1.4;
+    }
+
+    .quiz-opt:hover:not(:disabled) {
+      background: #352157;
+      transform: translate(-1px, -1px);
+      box-shadow: 5px 5px 0px #000000;
+      border-color: var(--yellow);
+    }
+
+    .quiz-opt .opt-key {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: var(--yellow);
+      color: #120921;
+      border: 2px solid #000000;
+      box-shadow: 1px 1px 0px #000000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 900;
+      flex-shrink: 0;
+      font-family: 'JetBrains Mono', Consolas, monospace;
+    }
+
+    .quiz-opt.correct {
+      background: var(--mint);
+      color: #04261d;
+      border-color: #000000;
+    }
+
+    .quiz-opt.correct .opt-key {
+      background: #ffffff;
+      color: #04261d;
+    }
+
+    .quiz-opt.wrong {
+      background: var(--coral);
+      color: #ffffff;
+      border-color: #000000;
+    }
+
+    .quiz-opt.wrong .opt-key {
+      background: #000000;
+      color: #ffffff;
+    }
+
+    .quiz-opt:disabled {
+      cursor: not-allowed;
+    }
+
+    .quiz-timer-bar {
+      height: 10px;
+      background: #140d21;
+      border: 2px solid #000000;
+      border-radius: 20px;
+      overflow: hidden;
+      margin-bottom: 14px;
+    }
+
+    .quiz-timer-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #ff477e, var(--yellow), var(--mint));
+      border-radius: 20px;
+      transition: width 1s linear, background 0.3s ease;
+    }
+
+    .quiz-score-summary {
+      text-align: center;
+      padding: 30px;
+      display: none;
+    }
+
+    .quiz-score-summary.visible {
+      display: block;
+    }
+
+    .quiz-final-score {
+      font-size: 64px;
+      font-weight: 900;
+      font-family: 'JetBrains Mono', Consolas, monospace;
+      color: var(--yellow);
+      margin: 16px 0;
+      letter-spacing: -1px;
+      text-shadow: 3px 3px 0px #000000;
+    }
+
+    /* ============================================
+       ACHIEVEMENTS (CARTOON BADGE GRID)
+    ============================================ */
+    #achievements-section {
+      margin-top: 28px;
+    }
+
+    .achievements-toggle {
+      width: 100%;
+      background: var(--panel);
+      border: 3px solid #000000;
+      box-shadow: var(--shadow-comic);
+      border-radius: var(--radius);
+      padding: 14px 20px;
+      color: #ffffff;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 14px;
+      font-weight: 900;
+      transition: all 0.12s ease;
+    }
+
+    .achievements-toggle:hover {
+      background: #362354;
+      transform: translate(-1px, -1px);
+      box-shadow: 5px 5px 0px #000000;
+    }
+
+    .achievements-grid {
+      display: none;
+      grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+      gap: 14px;
+      padding: 18px;
+      background: var(--panel);
+      border: 3px solid #000000;
+      border-top: none;
+      border-radius: 0 0 var(--radius) var(--radius);
+    }
+
+    .achievements-grid.visible {
+      display: grid;
+    }
+
+    .achievement-card {
+      background: #1e1333;
+      border: 2px solid #000000;
+      box-shadow: var(--shadow-comic-sm);
+      border-radius: var(--radius);
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      transition: all 0.12s ease;
+    }
+
+    .achievement-card.unlocked {
+      background: var(--yellow);
+      color: #150a24;
+      border-color: #000000;
+      box-shadow: 3px 3px 0px #000000;
+    }
+
+    .achievement-card.unlocked .ach-name {
+      color: #150a24;
+    }
+
+    .achievement-card.unlocked .ach-desc {
+      color: #432e60;
+      font-weight: 600;
+    }
+
+    .achievement-card.unlocked .ach-status {
+      color: #7c2d12;
+    }
+
+    .achievement-card.locked {
+      opacity: 0.45;
+    }
+
+    .ach-icon {
+      font-size: 26px;
+    }
+
+    .ach-name {
+      font-size: 13px;
+      font-weight: 900;
+      color: #ffffff;
+    }
+
+    .ach-desc {
+      font-size: 11px;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    .ach-status {
+      font-size: 10px;
+      font-weight: 900;
+      margin-top: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+    }
+
+    .ach-status.unlocked {
+      color: #150a24;
+    }
+
+    .ach-status.locked {
+      color: var(--text-dim);
+    }
+
+    /* ============================================
+       MODAL (CARTOON POPUP)
+    ============================================ */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(12, 7, 22, 0.85);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 200;
+      padding: 20px;
+    }
+
+    .modal-overlay.visible {
+      display: flex;
+    }
+
+    .modal-box {
+      background: #25183d;
+      border: 4px solid #000000;
+      border-radius: var(--radius-lg);
+      padding: 30px;
+      max-width: 440px;
+      width: 100%;
+      box-shadow: 8px 8px 0px #000000;
+      animation: popIn 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .modal-title {
+      font-size: 18px;
+      font-weight: 900;
+      margin-bottom: 20px;
+      color: var(--yellow);
+      text-shadow: 1px 1px 0px #000000;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .modal-stat-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 2px solid rgba(0, 0, 0, 0.5);
+      font-size: 13.5px;
+      font-weight: 600;
+    }
+
+    .modal-stat-row:last-of-type {
+      border-bottom: none;
+    }
+
+    .modal-stat-label {
+      color: var(--text-muted);
+      font-weight: 700;
+    }
+
+    .modal-stat-val {
+      color: #ffffff;
+      font-weight: 800;
+    }
+
+    .modal-confirm-input {
+      width: 100%;
+      background: #140d21;
+      border: 2px solid #000000;
+      box-shadow: inset 1px 1px 0px rgba(0, 0, 0, 0.5);
+      color: #ffffff;
+      border-radius: var(--radius-sm);
+      padding: 0 14px;
+      height: 44px;
+      font-family: 'JetBrains Mono', Consolas, monospace;
+      font-size: 14px;
+      font-weight: 700;
+      margin: 14px 0;
+    }
+
+    .modal-confirm-input:focus {
+      outline: none;
+      border-color: var(--yellow);
+      box-shadow: 0 0 0 3px rgba(255, 209, 102, 0.4);
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      margin-top: 20px;
+    }
+
+    /* ============================================
+       TOAST NOTIFICATION (CARTOON BADGE)
+    ============================================ */
+    #toast-container {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      z-index: 300;
+    }
+
+    .toast {
+      background: #ffd166;
+      color: #120921;
+      border: 3px solid #000000;
+      border-radius: 12px;
+      padding: 12px 16px;
+      font-size: 13.5px;
+      font-weight: 900;
+      box-shadow: var(--shadow-comic);
+      animation: popIn 0.2s ease;
+      max-width: 320px;
+    }
+
+    .toast.success {
+      background: var(--mint);
+      color: #02261d;
+    }
+
+    .toast.error {
+      background: var(--coral);
+      color: #ffffff;
+    }
+
+    .toast.achievement {
+      background: var(--yellow);
+      color: #150d24;
+    }
+
+    /* ============================================
+       UTILITY
+    ============================================ */
+    .flex {
+      display: flex;
+    }
+
+    .flex-wrap {
+      flex-wrap: wrap;
+    }
+
+    .items-center {
+      align-items: center;
+    }
+
+    .gap-8 {
+      gap: 8px;
+    }
+
+    .gap-10 {
+      gap: 10px;
+    }
+
+    .gap-12 {
+      gap: 12px;
+    }
+
+    .gap-16 {
+      gap: 16px;
+    }
+
+    .w-full {
+      width: 100%;
+    }
+
+    .text-muted {
+      color: var(--text-muted);
+    }
+
+    .text-sm {
+      font-size: 12px;
+    }
+
+    .text-mono {
+      font-family: 'JetBrains Mono', Consolas, monospace;
+    }
+
+    .mb-8 {
+      margin-bottom: 8px;
+    }
+
+    .mb-12 {
+      margin-bottom: 12px;
+    }
+
+    .mt-8 {
+      margin-top: 8px;
+    }
+
+    .start-screen {
+      text-align: center;
+      padding: 44px 20px;
+    }
+
+    .start-screen h2 {
+      font-size: 24px;
+      font-weight: 900;
+      margin-bottom: 12px;
+      color: var(--yellow);
+      text-shadow: 2px 2px 0px #000000;
+    }
+
+    .start-screen p {
+      color: var(--text-muted);
+      margin-bottom: 24px;
+      max-width: 440px;
+      margin-left: auto;
+      margin-right: auto;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .game-over-screen {
+      text-align: center;
+      padding: 34px;
+      display: none;
+    }
+
+    .game-over-screen.visible {
+      display: block;
+    }
+
+    .game-over-title {
+      font-size: 28px;
+      font-weight: 900;
+      margin-bottom: 12px;
+      color: var(--yellow);
+      text-shadow: 2px 2px 0px #000000;
+    }
+
+    @media (max-width: 640px) {
+      #app-header {
+        gap: 8px;
+        padding: 0 12px;
+      }
+
+      .header-level {
+        min-width: 120px;
+      }
+
+      .xp-bar {
+        width: 70px;
+      }
+
+      #main {
+        padding: 12px;
+        padding-top: calc(var(--header-h) + var(--tab-h) + 12px);
+      }
+
+      .subnet-ip {
+        font-size: 18px;
+      }
+
+      .quiz-question-box {
+        font-size: 15px;
+        padding: 18px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .header-stat {
+        display: none;
+      }
+
+      .header-sep {
+        display: none;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ==================== HEADER ==================== -->
+  <header id="app-header">
+    <div class="header-logo">⚡ Lab <span>Andiel</span></div>
+    <div class="header-sep"></div>
+    <div class="header-level">
+      <div class="header-level-label" id="level-label">Siswa Magang</div>
+      <div class="xp-bar-wrap">
+        <div class="xp-bar">
+          <div class="xp-bar-fill" id="xp-bar-fill" style="width:0%"></div>
+        </div>
+        <span class="xp-text" id="xp-text">0 / 100 XP</span>
+      </div>
+    </div>
+    <div class="header-sep"></div>
+    <div class="header-stat">Skor: <strong id="hdr-score">0</strong></div>
+    <div class="header-stat">🔥 <strong id="hdr-streak">0</strong></div>
+    <div class="header-spacer"></div>
+    <button class="btn-icon" id="btn-mute" aria-label="Toggle suara" title="Toggle suara">🔊</button>
+    <button class="btn-icon" id="btn-settings" aria-label="Pengaturan" title="Pengaturan">⚙</button>
+  </header>
+
+  <!-- ==================== TAB NAV ==================== -->
+  <nav id="tab-nav" role="tablist" aria-label="Game navigation">
+    <button class="tab-btn active" data-tab="cli" role="tab" aria-selected="true">🖥 CLI Troubleshooter</button>
+    <button class="tab-btn" data-tab="crimping" role="tab" aria-selected="false">🔌 Crimping RJ-45</button>
+    <button class="tab-btn" data-tab="subnetting" role="tab" aria-selected="false">🧮 Subnetting Blitz</button>
+    <button class="tab-btn" data-tab="linux" role="tab" aria-selected="false">🛡 Linux Defense</button>
+    <button class="tab-btn" data-tab="quiz" role="tab" aria-selected="false">📝 Port & OSI Quiz</button>
+  </nav>
+
+  <!-- ==================== MAIN CONTENT ==================== -->
+  <main id="main">
+
+    <!-- ===== GAME 1: CLI TROUBLESHOOTER ===== -->
+    <section id="tab-cli" class="game-panel active" role="tabpanel" aria-label="CLI Troubleshooter">
+      <div id="cli-start" class="start-screen">
+        <h2>CLI Network Troubleshooter</h2>
+        <p>Diagnosa masalah jaringan menggunakan perintah CLI. Ketik perintah di terminal untuk menganalisis topologi
+          dan temukan solusinya.</p>
+        <button class="btn btn-primary" id="cli-start-btn">Mulai Misi</button>
+      </div>
+
+      <div id="cli-game" style="display:none">
+        <div class="panel-box">
+          <div class="panel-header">
+            <span class="panel-title">Topologi Jaringan</span>
+            <span id="cli-scenario-name" class="text-muted text-sm">-</span>
+          </div>
+          <div class="panel-body" style="padding: 10px 14px;">
+            <svg id="cli-topology" viewBox="0 0 700 80" xmlns="http://www.w3.org/2000/svg"
+              aria-label="Network topology diagram"></svg>
+          </div>
+        </div>
+
+        <div class="panel-box">
+          <div class="panel-header">
+            <div class="flex items-center gap-12 flex-wrap">
+              <span id="cli-mission-desc" class="text-sm" style="color:var(--amber)">-</span>
+            </div>
+            <div class="flex items-center gap-12">
+              <div class="lives" id="cli-lives" aria-label="Sisa nyawa"></div>
+              <div class="timer-display" id="cli-timer">03:00</div>
+            </div>
+          </div>
+
+          <div class="panel-body" style="padding: 10px 14px;">
+            <div class="cli-terminal" id="cli-terminal-output" role="log" aria-live="polite"
+              aria-label="Terminal output"></div>
+            <div class="terminal-input-row">
+              <span class="terminal-prompt">C:\&gt;</span>
+              <input type="text" class="terminal-input" id="cli-input" placeholder="ketik perintah..."
+                autocomplete="off" spellcheck="false" maxlength="80" aria-label="Terminal input" />
+            </div>
+          </div>
+
+          <div class="action-panel" id="cli-action-panel" aria-label="Action options">
+            <div class="action-panel-title">Pilih Tindakan Perbaikan:</div>
+            <div class="action-opts" id="cli-action-opts"></div>
+          </div>
+        </div>
+
+        <div class="game-over-screen" id="cli-game-over">
+          <div class="game-over-title" id="cli-go-title">Misi Selesai!</div>
+          <div style="color:var(--text-muted); margin-bottom:16px;" id="cli-go-desc">-</div>
+          <button class="btn btn-primary" id="cli-restart-btn">Main Lagi</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== GAME 2: CRIMPING ===== -->
+    <section id="tab-crimping" class="game-panel" role="tabpanel" aria-label="Crimping RJ-45">
+      <div class="panel-box">
+        <div class="panel-header">
+          <span class="panel-title">Mode Crimping</span>
+          <span id="crimp-score-label" class="text-muted text-sm">Skor: 0</span>
+        </div>
+        <div class="crimp-modes">
+          <button class="crimp-mode-btn active" data-mode="straight" aria-pressed="true">Straight-Through
+            (T568B)</button>
+          <button class="crimp-mode-btn" data-mode="crossover" aria-pressed="false">Crossover (T568A-T568B)</button>
+          <button class="crimp-mode-btn" data-mode="repair" aria-pressed="false">Perbaiki Kabel Rusak</button>
+        </div>
+
+        <div class="panel-body" style="padding:0">
+          <div style="padding: 10px 14px;">
+            <div class="text-muted text-sm mb-8">Klik kabel di bawah, lalu klik slot konektor untuk memasangnya. Klik
+              slot terisi untuk melepas.</div>
+            <div class="wire-tray" id="wire-tray" aria-label="Wire tray"></div>
+          </div>
+
+          <div class="crimp-workspace">
+            <div class="crimp-side">
+              <div class="crimp-side-label" id="side-a-label">Sisi A (T568B)</div>
+              <div class="connector-slots" id="slots-a" aria-label="Connector A slots"></div>
+              <div class="text-muted text-sm mt-8" id="side-a-target"></div>
+            </div>
+            <div class="crimp-side">
+              <div class="crimp-side-label" id="side-b-label">Sisi B (T568B)</div>
+              <div class="connector-slots" id="slots-b" aria-label="Connector B slots"></div>
+              <div class="text-muted text-sm mt-8" id="side-b-target"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="crimp-actions">
+          <button class="btn btn-primary" id="btn-crimp">CRIMP!</button>
+          <button class="btn btn-secondary" id="btn-test-cable" disabled>Test Kabel</button>
+          <button class="btn btn-secondary" id="btn-crimp-reset">Reset</button>
+          <div id="crimp-crimped-label" class="text-sm text-muted" style="display:none">Kabel dikrimping! Klik Test.
+          </div>
+        </div>
+
+        <div class="cable-tester">
+          <div class="panel-title mb-8">Cable Tester</div>
+          <div class="tester-leds" id="tester-leds" aria-label="LED indicators">
+            <div class="led" data-pin="1">1</div>
+            <div class="led" data-pin="2">2</div>
+            <div class="led" data-pin="3">3</div>
+            <div class="led" data-pin="4">4</div>
+            <div class="led" data-pin="5">5</div>
+            <div class="led" data-pin="6">6</div>
+            <div class="led" data-pin="7">7</div>
+            <div class="led" data-pin="8">8</div>
+          </div>
+          <div class="tester-result" id="tester-result"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== GAME 3: SUBNETTING ===== -->
+    <section id="tab-subnetting" class="game-panel" role="tabpanel" aria-label="Subnetting Blitz">
+      <div id="subnet-start" class="start-screen">
+        <h2>Subnetting & CIDR Blitz</h2>
+        <p>Time attack! Hitung Network ID, Broadcast, Hosts, dan Subnet Mask secepat mungkin. Combo multiplier
+          menggandakan XP kamu.</p>
+        <button class="btn btn-primary" id="subnet-start-btn">Mulai Time Attack</button>
+      </div>
+
+      <div id="subnet-game" style="display:none">
+        <div class="panel-box">
+          <div class="panel-header">
+            <span class="panel-title">Time Attack Mode</span>
+            <div class="flex items-center gap-12 flex-wrap">
+              <span class="text-sm text-muted">Skor: <strong id="subnet-score">0</strong></span>
+              <span class="combo-display" id="subnet-combo">x1</span>
+              <div class="timer-display" id="subnet-timer">00:30</div>
+            </div>
+          </div>
+
+          <div class="panel-body">
+            <div class="subnet-timer-bar">
+              <div class="subnet-timer-fill" id="subnet-timer-fill" style="width:100%"></div>
+            </div>
+
+            <div class="subnet-question-box">
+              <div class="subnet-ip" id="subnet-question">192.168.10.45 / 27</div>
+            </div>
+
+            <div class="subnet-fields">
+              <div class="field-group">
+                <label class="field-label" for="f-networkid">Network ID:</label>
+                <input type="text" class="field-input text-mono" id="f-networkid" placeholder="x.x.x.x"
+                  autocomplete="off" maxlength="18" />
+              </div>
+              <div class="field-group">
+                <label class="field-label" for="f-broadcast">Broadcast ID:</label>
+                <input type="text" class="field-input text-mono" id="f-broadcast" placeholder="x.x.x.x"
+                  autocomplete="off" maxlength="18" />
+              </div>
+              <div class="field-group">
+                <label class="field-label" for="f-hosts">Usable Hosts:</label>
+                <input type="text" class="field-input text-mono" id="f-hosts" placeholder="angka" autocomplete="off"
+                  maxlength="10" />
+              </div>
+              <div class="field-group">
+                <label class="field-label" for="f-mask">Subnet Mask:</label>
+                <input type="text" class="field-input text-mono" id="f-mask" placeholder="x.x.x.x" autocomplete="off"
+                  maxlength="18" />
+              </div>
+            </div>
+
+            <div class="flex gap-8 mb-12 flex-wrap">
+              <button class="btn btn-primary" id="subnet-submit-btn">Jawab!</button>
+              <button class="btn btn-secondary" id="subnet-binary-toggle">Bantuan Biner ▼</button>
+              <button class="btn btn-secondary" id="subnet-next-btn" style="display:none">Soal Berikutnya</button>
+            </div>
+
+            <div class="explanation-panel" id="subnet-explanation" aria-live="polite"></div>
+
+            <div class="binary-table" id="binary-table">
+              <div class="panel-title mb-8">Tabel Biner Cepat</div>
+              <div class="binary-row">
+                <div class="bit-cell header">128</div>
+                <div class="bit-cell header">64</div>
+                <div class="bit-cell header">32</div>
+                <div class="bit-cell header">16</div>
+                <div class="bit-cell header">8</div>
+                <div class="bit-cell header">4</div>
+                <div class="bit-cell header">2</div>
+                <div class="bit-cell header">1</div>
+              </div>
+              <div class="binary-row">
+                <div class="bit-cell value">1</div>
+                <div class="bit-cell value">1</div>
+                <div class="bit-cell value">1</div>
+                <div class="bit-cell value">1</div>
+                <div class="bit-cell value">1</div>
+                <div class="bit-cell value">1</div>
+                <div class="bit-cell value">1</div>
+                <div class="bit-cell value">1</div>
+              </div>
+              <table class="cidr-table">
+                <thead>
+                  <tr>
+                    <th>CIDR</th>
+                    <th>Subnet Mask</th>
+                    <th>Hosts</th>
+                    <th>Block</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>/16</td>
+                    <td>255.255.0.0</td>
+                    <td>65534</td>
+                    <td>65536</td>
+                  </tr>
+                  <tr>
+                    <td>/20</td>
+                    <td>255.255.240.0</td>
+                    <td>4094</td>
+                    <td>4096</td>
+                  </tr>
+                  <tr>
+                    <td>/22</td>
+                    <td>255.255.252.0</td>
+                    <td>1022</td>
+                    <td>1024</td>
+                  </tr>
+                  <tr>
+                    <td>/23</td>
+                    <td>255.255.254.0</td>
+                    <td>510</td>
+                    <td>512</td>
+                  </tr>
+                  <tr>
+                    <td>/24</td>
+                    <td>255.255.255.0</td>
+                    <td>254</td>
+                    <td>256</td>
+                  </tr>
+                  <tr>
+                    <td>/25</td>
+                    <td>255.255.255.128</td>
+                    <td>126</td>
+                    <td>128</td>
+                  </tr>
+                  <tr>
+                    <td>/26</td>
+                    <td>255.255.255.192</td>
+                    <td>62</td>
+                    <td>64</td>
+                  </tr>
+                  <tr>
+                    <td>/27</td>
+                    <td>255.255.255.224</td>
+                    <td>30</td>
+                    <td>32</td>
+                  </tr>
+                  <tr>
+                    <td>/28</td>
+                    <td>255.255.255.240</td>
+                    <td>14</td>
+                    <td>16</td>
+                  </tr>
+                  <tr>
+                    <td>/29</td>
+                    <td>255.255.255.248</td>
+                    <td>6</td>
+                    <td>8</td>
+                  </tr>
+                  <tr>
+                    <td>/30</td>
+                    <td>255.255.255.252</td>
+                    <td>2</td>
+                    <td>4</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="game-over-screen" id="subnet-game-over">
+          <div class="game-over-title">Waktu Habis!</div>
+          <div class="text-muted mb-12" id="subnet-go-desc">-</div>
+          <button class="btn btn-primary" id="subnet-restart-btn">Main Lagi</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== GAME 4: LINUX DEFENSE ===== -->
+    <section id="tab-linux" class="game-panel" role="tabpanel" aria-label="Linux Defense">
+      <div id="linux-start" class="start-screen">
+        <h2>Linux Server & Firewall Defense</h2>
+        <p>Server kamu diserang! Pantau log serangan dan jalankan perintah Linux yang tepat untuk menghentikan ancaman
+          sebelum HP server habis.</p>
+        <button class="btn btn-primary" id="linux-start-btn">Siapkan Pertahanan</button>
+      </div>
+
+      <div id="linux-game" style="display:none">
+        <div class="panel-box mb-12">
+          <div class="panel-header">
+            <span class="panel-title">Status Server</span>
+            <div class="flex items-center gap-12 flex-wrap">
+              <span class="text-sm text-muted">HP: <strong id="linux-hp-val">100</strong>/100</span>
+              <div class="server-hp-bar" style="width:150px">
+                <div class="server-hp-fill" id="linux-hp-fill" style="width:100%; background:var(--green)"></div>
+              </div>
+              <div class="wave-indicator" id="linux-waves" aria-label="Wave progress"></div>
+              <div class="timer-display" id="linux-timer">60</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="linux-layout">
+          <div>
+            <div class="panel-box">
+              <div class="panel-header">
+                <span class="panel-title">Live Attack Log</span>
+                <span id="linux-xp-label" class="text-sm text-muted">XP Earned: 0</span>
+              </div>
+              <div class="attack-log" id="attack-log" role="log" aria-live="polite" aria-label="Attack log"></div>
+              <div style="padding: 8px 10px; border-top: 1px solid var(--border);">
+                <div class="linux-terminal-row">
+                  <span class="terminal-prompt" style="font-size:12px; padding-top: 8px;">$</span>
+                  <input type="text" class="linux-input" id="linux-cmd-input" placeholder="masukkan perintah..."
+                    autocomplete="off" maxlength="80" aria-label="Linux command input" />
+                  <button class="btn btn-secondary" id="linux-cmd-submit"
+                    style="height:36px; padding: 0 12px;">Jalankan</button>
+                </div>
+              </div>
+            </div>
+            <div class="panel-box mt-8">
+              <div class="panel-header"><span class="panel-title">Active Rules</span></div>
+              <div class="active-rules-panel" id="active-rules" aria-live="polite" aria-label="Active firewall rules">
+                Belum ada rule aktif.</div>
+            </div>
+          </div>
+
+          <div>
+            <div class="panel-box">
+              <div class="panel-header"><span class="panel-title">Quick Commands</span></div>
+              <div style="padding: 10px;">
+                <div class="quick-cmds" id="quick-cmds">
+                  <button class="quick-cmd-btn" data-cmd="ufw deny 22 from {ip}">ufw deny 22 from {ip}</button>
+                  <button class="quick-cmd-btn" data-cmd="ufw deny 80 from {ip}">ufw deny 80 from {ip}</button>
+                  <button class="quick-cmd-btn" data-cmd="ufw deny from {ip}">ufw deny from {ip}</button>
+                  <button class="quick-cmd-btn" data-cmd="ufw allow 80">ufw allow 80</button>
+                  <button class="quick-cmd-btn" data-cmd="ufw allow 22">ufw allow 22</button>
+                  <button class="quick-cmd-btn" data-cmd="systemctl restart nginx">systemctl restart nginx</button>
+                  <button class="quick-cmd-btn" data-cmd="systemctl restart ssh">systemctl restart ssh</button>
+                  <button class="quick-cmd-btn" data-cmd="chmod 600 /etc/ssh/sshd_config">chmod 600
+                    /etc/ssh/sshd_config</button>
+                  <button class="quick-cmd-btn" data-cmd="ufw status">ufw status</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="game-over-screen" id="linux-game-over">
+          <div class="game-over-title" id="linux-go-title">-</div>
+          <div class="text-muted mb-12" id="linux-go-desc">-</div>
+          <button class="btn btn-primary" id="linux-restart-btn">Main Lagi</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== GAME 5: QUIZ ===== -->
+    <section id="tab-quiz" class="game-panel" role="tabpanel" aria-label="Port & OSI Quiz">
+      <div id="quiz-start" class="start-screen">
+        <h2>Port & OSI Layer Arcade Quiz</h2>
+        <p>20 pertanyaan tentang port protokol dan layer OSI. Kamu punya 10 detik per soal. Raih combo untuk XP berlipat
+          ganda!</p>
+        <button class="btn btn-primary" id="quiz-start-btn">Mulai Quiz</button>
+      </div>
+
+      <div id="quiz-game" style="display:none">
+        <div class="panel-box">
+          <div class="panel-header">
+            <span class="panel-title">Quiz Arcade</span>
+            <div class="flex items-center gap-12 flex-wrap">
+              <span class="text-sm text-muted">Skor: <strong id="quiz-score">0</strong></span>
+              <span class="text-sm text-muted">Soal: <strong id="quiz-qnum">1</strong>/20</span>
+              <span class="combo-display" id="quiz-combo">x1</span>
+            </div>
+          </div>
+
+          <div class="panel-body">
+            <div class="quiz-timer-bar">
+              <div class="quiz-timer-fill" id="quiz-timer-fill" style="width:100%"></div>
+            </div>
+            <div class="text-sm text-muted mb-8">Waktu: <strong id="quiz-timer-val">10</strong>s | Streak: 🔥 <strong
+                id="quiz-streak">0</strong></div>
+
+            <div class="quiz-question-box" id="quiz-question">-</div>
+
+            <div class="quiz-options" id="quiz-options"></div>
+          </div>
+        </div>
+
+        <div class="quiz-score-summary" id="quiz-summary">
+          <div style="font-size:18px; font-weight:700; margin-bottom:8px;">Quiz Selesai!</div>
+          <div class="quiz-final-score" id="quiz-final-score">0</div>
+          <div class="text-muted mb-12" id="quiz-final-desc">-</div>
+          <button class="btn btn-primary" id="quiz-restart-btn">Main Lagi</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== ACHIEVEMENTS ===== -->
+    <div id="achievements-section">
+      <button class="achievements-toggle" id="achievements-toggle" aria-expanded="false">
+        <span>🏆 Pencapaian</span>
+        <span id="ach-toggle-icon">▼</span>
+      </button>
+      <div class="achievements-grid" id="achievements-grid" aria-label="Achievements"></div>
+    </div>
+
+  </main>
+
+  <!-- ===== SETTINGS MODAL ===== -->
+  <div class="modal-overlay" id="settings-modal" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+    <div class="modal-box">
+      <div class="modal-title" id="settings-title">Pengaturan & Statistik</div>
+      <div id="modal-stats"></div>
+      <div style="margin-top:16px; border-top:1px solid var(--border); padding-top:14px;">
+        <div class="text-sm text-muted mb-8">Ketik <code style="color:var(--red)">RESET</code> untuk konfirmasi hapus
+          semua progres:</div>
+        <input type="text" class="modal-confirm-input" id="reset-confirm-input" placeholder="Ketik RESET di sini..."
+          maxlength="10" autocomplete="off" aria-label="Reset confirmation" />
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" id="modal-close-btn">Tutup</button>
+        <button class="btn btn-danger" id="modal-reset-btn" disabled>Reset Semua Progres</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== TOAST CONTAINER ===== -->
+  <div id="toast-container" aria-live="assertive" aria-label="Notifications"></div>
+
+  <script>
+    'use strict';
+
+    // ============================================================
+    //  GLOBAL STATE & STORAGE
+    // ============================================================
+    const STORAGE_KEY = 'lab_andiel_progress';
+
+    const LEVEL_THRESHOLDS = [
+      { name: 'Siswa Magang', min: 0, max: 99 },
+      { name: 'Teknisi Junior', min: 100, max: 299 },
+      { name: 'Teknisi Madya', min: 300, max: 599 },
+      { name: 'Network Engineer', min: 600, max: 999 },
+      { name: 'Senior Network Architect', min: 1000, max: 1999 },
+      { name: 'Principal Network Architect', min: 2000, max: Infinity }
+    ];
+
+    function defaultState() {
+      return {
+        xp: 0,
+        totalScore: 0,
+        streak: 0,
+        lastPlayed: null,
+        highScores: { cli: 0, crimping: 0, subnetting: 0, linux: 0, quiz: 0 },
+        achievements: [],
+        muted: false
+      };
+    }
+
+    let state = defaultState();
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          state = Object.assign(defaultState(), parsed);
+        }
+      } catch (e) {
+        state = defaultState();
+      }
+    }
+
+    function saveState() {
+      try {
+        state.lastPlayed = new Date().toISOString();
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      } catch (e) { }
+    }
+
+    // ============================================================
+    //  SOUND SYSTEM
+    // ============================================================
+    function playSound(type) {
+      if (state.muted) return;
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const now = ctx.currentTime;
+        const gain = ctx.createGain();
+        gain.connect(ctx.destination);
+
+        if (type === 'click') {
+          const osc = ctx.createOscillator();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(800, now);
+          gain.gain.setValueAtTime(0.15, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+          osc.connect(gain);
+          osc.start(now);
+          osc.stop(now + 0.05);
+        } else if (type === 'success') {
+          const osc = ctx.createOscillator();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(440, now);
+          osc.frequency.linearRampToValueAtTime(880, now + 0.3);
+          gain.gain.setValueAtTime(0.2, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+          osc.connect(gain);
+          osc.start(now);
+          osc.stop(now + 0.3);
+        } else if (type === 'error') {
+          const osc = ctx.createOscillator();
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(300, now);
+          osc.frequency.linearRampToValueAtTime(150, now + 0.2);
+          gain.gain.setValueAtTime(0.2, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+          osc.connect(gain);
+          osc.start(now);
+          osc.stop(now + 0.2);
+        } else if (type === 'levelup') {
+          const notes = [523, 659, 784];
+          notes.forEach((freq, i) => {
+            const osc = ctx.createOscillator();
+            const g = ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq, now + i * 0.2);
+            g.gain.setValueAtTime(0.25, now + i * 0.2);
+            g.gain.exponentialRampToValueAtTime(0.001, now + i * 0.2 + 0.18);
+            osc.connect(g);
+            g.connect(ctx.destination);
+            osc.start(now + i * 0.2);
+            osc.stop(now + i * 0.2 + 0.18);
+          });
+        } else if (type === 'packet') {
+          const osc = ctx.createOscillator();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(1200, now);
+          gain.gain.setValueAtTime(0.1, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+          osc.connect(gain);
+          osc.start(now);
+          osc.stop(now + 0.05);
+        } else if (type === 'alarm') {
+          const osc = ctx.createOscillator();
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(200, now);
+          gain.gain.setValueAtTime(0.15, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+          osc.connect(gain);
+          osc.start(now);
+          osc.stop(now + 0.4);
+        }
+      } catch (e) { }
+    }
+
+    // ============================================================
+    //  TIMER MANAGEMENT
+    // ============================================================
+    window.activeTimers = [];
+
+    function clearAllTimers() {
+      window.activeTimers.forEach(id => {
+        clearInterval(id);
+        clearTimeout(id);
+      });
+      window.activeTimers = [];
+    }
+
+    function safeSetInterval(fn, ms) {
+      const id = setInterval(fn, ms);
+      window.activeTimers.push(id);
+      return id;
+    }
+
+    function safeSetTimeout(fn, ms) {
+      const id = setTimeout(fn, ms);
+      window.activeTimers.push(id);
+      return id;
+    }
+
+    // ============================================================
+    //  UI HELPERS
+    // ============================================================
+    function showToast(msg, type = 'info', duration = 3000) {
+      const container = document.getElementById('toast-container');
+      const el = document.createElement('div');
+      el.className = 'toast ' + type;
+      el.textContent = msg;
+      container.appendChild(el);
+      setTimeout(() => { el.remove(); }, duration);
+    }
+
+    function getLevelInfo(xp) {
+      for (let i = LEVEL_THRESHOLDS.length - 1; i >= 0; i--) {
+        if (xp >= LEVEL_THRESHOLDS[i].min) {
+          return { index: i, ...LEVEL_THRESHOLDS[i] };
+        }
+      }
+      return { index: 0, ...LEVEL_THRESHOLDS[0] };
+    }
+
+    function updateHeader() {
+      const lv = getLevelInfo(state.xp);
+      document.getElementById('level-label').textContent = lv.name;
+      const nextThreshold = lv.max === Infinity ? state.xp : lv.max + 1;
+      const progress = lv.max === Infinity ? 100 : ((state.xp - lv.min) / (lv.max + 1 - lv.min)) * 100;
+      document.getElementById('xp-bar-fill').style.width = Math.min(progress, 100) + '%';
+      document.getElementById('xp-text').textContent = state.xp + ' / ' + (lv.max === Infinity ? state.xp : lv.max + 1) + ' XP';
+      document.getElementById('hdr-score').textContent = state.totalScore;
+      document.getElementById('hdr-streak').textContent = state.streak;
+      document.getElementById('btn-mute').textContent = state.muted ? '🔇' : '🔊';
+    }
+
+    function addXP(amount) {
+      const prevLevel = getLevelInfo(state.xp).index;
+      state.xp += amount;
+      state.totalScore += amount;
+      const newLevel = getLevelInfo(state.xp).index;
+      if (newLevel > prevLevel) {
+        playSound('levelup');
+        showToast('Level Up! Sekarang: ' + getLevelInfo(state.xp).name, 'achievement', 4000);
+        checkAchievement('network_guru');
+      }
+      saveState();
+      updateHeader();
+    }
+
+    function formatTime(seconds) {
+      const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+      const s = (seconds % 60).toString().padStart(2, '0');
+      return m + ':' + s;
+    }
+
+    // ============================================================
+    //  ACHIEVEMENTS
+    // ============================================================
+    const ACHIEVEMENTS_DEF = [
+      { id: 'first_blood', icon: '🏆', name: 'First Blood', desc: 'Selesaikan game apapun untuk pertama kalinya' },
+      { id: 'subnetter_pro', icon: '🧮', name: 'Subnetter Pro', desc: 'Raih skor 500+ di Subnetting Blitz' },
+      { id: 'cable_master', icon: '🔌', name: 'Cable Master', desc: 'Selesaikan crimping dengan akurasi 100%' },
+      { id: 'defender', icon: '🛡', name: 'Defender', desc: 'Survive 3 wave di Linux Defense' },
+      { id: 'quiz_ace', icon: '🎯', name: 'Quiz Ace', desc: 'Jawab 10 soal berturut-turut benar di Quiz' },
+      { id: 'speed_demon', icon: '⚡', name: 'Speed Demon', desc: 'Selesaikan Subnetting Blitz dalam 60 detik dengan 5+ jawaban benar' },
+      { id: 'network_guru', icon: '👑', name: 'Network Guru', desc: 'Capai Level 4: Network Engineer' }
+    ];
+
+    function checkAchievement(id) {
+      if (state.achievements.includes(id)) return;
+      state.achievements.push(id);
+      saveState();
+      const def = ACHIEVEMENTS_DEF.find(a => a.id === id);
+      if (def) {
+        playSound('levelup');
+        showToast(def.icon + ' Pencapaian: ' + def.name, 'achievement', 5000);
+      }
+      renderAchievements();
+    }
+
+    function renderAchievements() {
+      const grid = document.getElementById('achievements-grid');
+      grid.innerHTML = '';
+      ACHIEVEMENTS_DEF.forEach(def => {
+        const unlocked = state.achievements.includes(def.id);
+        const card = document.createElement('div');
+        card.className = 'achievement-card ' + (unlocked ? 'unlocked' : 'locked');
+        card.innerHTML = '<div class="ach-icon">' + def.icon + '</div>' +
+          '<div class="ach-name">' + def.name + '</div>' +
+          '<div class="ach-desc">' + def.desc + '</div>' +
+          '<div class="ach-status ' + (unlocked ? 'unlocked' : 'locked') + '">' + (unlocked ? 'UNLOCKED' : 'LOCKED') + '</div>';
+        grid.appendChild(card);
+      });
+    }
+
+    // ============================================================
+    //  TAB NAVIGATION
+    // ============================================================
+    let currentTab = 'cli';
+
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        clearAllTimers();
+        const tab = btn.dataset.tab;
+        currentTab = tab;
+        document.querySelectorAll('.tab-btn').forEach(b => {
+          b.classList.toggle('active', b === btn);
+          b.setAttribute('aria-selected', b === btn ? 'true' : 'false');
+        });
+        document.querySelectorAll('.game-panel').forEach(p => {
+          p.classList.toggle('active', p.id === 'tab-' + tab);
+        });
+        playSound('click');
+      });
+    });
+
+    // ============================================================
+    //  GAME 1: CLI TROUBLESHOOTER
+    // ============================================================
+    const CLI_SCENARIOS = [
+      {
+        id: 1,
+        name: 'Subnet Mask Salah',
+        description: 'PC tidak bisa terhubung ke jaringan. Cek konfigurasi IP!',
+        faultNode: 'PC',
+        ipconfig: 'Windows IP Configuration\n\nEthernet adapter Local Area Connection:\n   IPv4 Address: 192.168.1.100\n   Subnet Mask: 255.255.0.0\n   Default Gateway: 192.168.1.1',
+        ping_gateway: 'fail',
+        ping_server: 'fail',
+        tracert: ['192.168.1.100 (PC)', '* * * Request timeout', '* * * Request timeout'],
+        arp: 'No ARP entries found.',
+        netstat: 'Active connections:\n  No active connections.',
+        diagnosis: 'Subnet mask salah (255.255.0.0 seharusnya 255.255.255.0)',
+        options: [
+          { text: 'Ganti subnet mask ke 255.255.255.0', correct: true },
+          { text: 'Ganti IP address ke 192.168.2.100', correct: false },
+          { text: 'Restart router', correct: false }
+        ],
+        xpReward: 50
+      },
+      {
+        id: 2,
+        name: 'Gateway Tidak Terdaftar',
+        description: 'PC bisa ping lokal tapi tidak bisa akses internet.',
+        faultNode: 'Router',
+        ipconfig: 'Ethernet adapter Local Area Connection:\n   IPv4 Address: 192.168.1.50\n   Subnet Mask: 255.255.255.0\n   Default Gateway: 192.168.1.254',
+        ping_gateway: 'fail',
+        ping_server: 'fail',
+        tracert: ['192.168.1.50', '* * * Request timeout'],
+        arp: '192.168.1.1  00-11-22-33-44-55\n192.168.1.254  incomplete',
+        netstat: 'Active connections:\n  No external connections.',
+        diagnosis: 'Gateway 192.168.1.254 tidak ada di jaringan (seharusnya 192.168.1.1)',
+        options: [
+          { text: 'Ganti default gateway ke 192.168.1.1', correct: true },
+          { text: 'Nonaktifkan firewall', correct: false },
+          { text: 'Restart switch', correct: false }
+        ],
+        xpReward: 60
+      },
+      {
+        id: 3,
+        name: 'Kabel Server Terputus',
+        description: 'Server tidak merespons. Semua user mengeluh tidak bisa akses.',
+        faultNode: 'Server',
+        ipconfig: 'Ethernet adapter Local Area Connection:\n   IPv4 Address: 192.168.1.10\n   Subnet Mask: 255.255.255.0\n   Default Gateway: 192.168.1.1',
+        ping_gateway: 'success',
+        ping_server: 'fail',
+        tracert: ['192.168.1.10', '192.168.1.1 (Router)', '192.168.1.254 (Firewall)', '* * * Request timeout'],
+        arp: '192.168.1.1  aa-bb-cc-dd-ee-ff',
+        netstat: 'Active connections:\n  TCP 192.168.1.10:80 ESTABLISHED\n  TCP 192.168.1.10:443 ESTABLISHED',
+        diagnosis: 'Kabel UTP dari firewall ke server terputus (link down pada port server)',
+        options: [
+          { text: 'Pasang kembali kabel UTP ke port server', correct: true },
+          { text: 'Restart service HTTP di server', correct: false },
+          { text: 'Tambah rule firewall untuk allow port 80', correct: false }
+        ],
+        xpReward: 70
+      },
+      {
+        id: 4,
+        name: 'Port Diblokir Firewall',
+        description: 'Website bisa diakses tapi SSH ke server gagal terus.',
+        faultNode: 'Firewall',
+        ipconfig: 'Ethernet adapter Local Area Connection:\n   IPv4 Address: 192.168.1.20\n   Subnet Mask: 255.255.255.0\n   Default Gateway: 192.168.1.1',
+        ping_gateway: 'success',
+        ping_server: 'success',
+        tracert: ['192.168.1.20', '192.168.1.1', '10.0.0.1 (FW)', '10.0.0.2 (Server)'],
+        arp: '192.168.1.1  aa-bb-cc-11-22-33',
+        netstat: 'Active connections:\n  TCP 192.168.1.20:80  ESTABLISHED\n  TCP 192.168.1.20:443 ESTABLISHED\n  TCP 192.168.1.20:22  Connection refused',
+        diagnosis: 'Firewall memblokir port 22 (SSH). Rule deny in pada port 22 aktif.',
+        options: [
+          { text: 'Buka port 22 di firewall (ufw allow 22)', correct: true },
+          { text: 'Restart SSH service di server', correct: false },
+          { text: 'Ganti port SSH ke 2222 tanpa buka firewall', correct: false }
+        ],
+        xpReward: 80
+      },
+      {
+        id: 5,
+        name: 'Konflik IP Address',
+        description: 'Dua perangkat punya IP sama, jaringan intermittent.',
+        faultNode: 'Switch',
+        ipconfig: 'Ethernet adapter Local Area Connection:\n   IPv4 Address: 192.168.1.100\n   Subnet Mask: 255.255.255.0\n   Default Gateway: 192.168.1.1\n   CONFLICT DETECTED: IP address conflict with 192.168.1.100',
+        ping_gateway: 'intermittent',
+        ping_server: 'intermittent',
+        tracert: ['192.168.1.100', 'Duplicate reply from 192.168.1.100', '* * * inconsistent routing'],
+        arp: '192.168.1.100  aa-bb-cc-dd-ee-ff (DUPLICATE)\n192.168.1.100  11-22-33-44-55-66 (DUPLICATE)',
+        netstat: 'Active connections:\n  Intermittent connections detected.',
+        diagnosis: 'Dua perangkat memiliki IP 192.168.1.100 yang sama. Konflik ARP.',
+        options: [
+          { text: 'Ganti IP salah satu perangkat ke 192.168.1.101', correct: true },
+          { text: 'Restart switch untuk clear MAC table', correct: false },
+          { text: 'Nonaktifkan kedua perangkat', correct: false }
+        ],
+        xpReward: 90
+      }
+    ];
+
+    const CLI_NODES = ['PC', 'Switch', 'Router', 'Firewall', 'Server'];
+
+    let cliState = {
+      active: false,
+      scenarioIndex: 0,
+      scenarioOrder: [],
+      lives: 3,
+      timeLeft: 180,
+      score: 0,
+      diagnosisShown: false,
+      currentScenario: null,
+      packetAnim: null
+    };
+
+    function cliGetCurrentScenario() {
+      return cliState.currentScenario;
+    }
+
+    function cliDrawTopology(faultNode) {
+      const svg = document.getElementById('cli-topology');
+      const nodeW = 96, nodeH = 38, gap = 24;
+      const nodes = CLI_NODES;
+      const nodeIcons = { 'PC': '💻', 'Switch': '🔀', 'Router': '🌐', 'Firewall': '🛡️', 'Server': '🖥️' };
+      const totalW = nodes.length * nodeW + (nodes.length - 1) * gap;
+      const startX = (700 - totalW) / 2;
+      const y = 22;
+
+      svg.innerHTML = '';
+
+      const faultIndex = nodes.indexOf(faultNode);
+
+      nodes.forEach((name, i) => {
+        const x = startX + i * (nodeW + gap);
+        const isFault = name === faultNode;
+        const isAfter = i > faultIndex && faultIndex >= 0;
+        const fillColor = isFault ? '#ff477e' : (isAfter ? '#ff7096' : '#ffd166');
+        const textColor = isFault ? '#ffffff' : (isAfter ? '#ffffff' : '#140c21');
+
+        // Comic connection cable
+        if (i < nodes.length - 1) {
+          const lineColor = (i >= faultIndex && faultIndex >= 0) ? '#ff477e' : '#06d6a0';
+          const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+          line.setAttribute('x1', x + nodeW);
+          line.setAttribute('y1', y + nodeH / 2);
+          line.setAttribute('x2', x + nodeW + gap);
+          line.setAttribute('y2', y + nodeH / 2);
+          line.setAttribute('stroke', lineColor);
+          line.setAttribute('stroke-width', '4');
+          line.setAttribute('stroke-linecap', 'round');
+          if (i < faultIndex || faultIndex < 0) {
+            line.setAttribute('stroke-dasharray', '6 5');
+            line.style.animation = 'dash-flow 0.5s linear infinite';
+          } else {
+            line.setAttribute('stroke-dasharray', '2 3');
+            line.setAttribute('opacity', '0.5');
+          }
+          svg.appendChild(line);
+        }
+
+        // Shadow rect for comic offset 3D effect
+        const shadowRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+        shadowRect.setAttribute('x', x + 3);
+        shadowRect.setAttribute('y', y + 3);
+        shadowRect.setAttribute('width', nodeW);
+        shadowRect.setAttribute('height', nodeH);
+        shadowRect.setAttribute('rx', '10');
+        shadowRect.setAttribute('fill', '#000000');
+        svg.appendChild(shadowRect);
+
+        // Node Box
+        const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+        rect.setAttribute('x', x);
+        rect.setAttribute('y', y);
+        rect.setAttribute('width', nodeW);
+        rect.setAttribute('height', nodeH);
+        rect.setAttribute('rx', '10');
+        rect.setAttribute('fill', fillColor);
+        rect.setAttribute('stroke', '#000000');
+        rect.setAttribute('stroke-width', '2.5');
+        svg.appendChild(rect);
+
+        // Node Icon + Label
+        const icon = nodeIcons[name] || '📦';
+        const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        text.setAttribute('x', x + nodeW / 2);
+        text.setAttribute('y', y + nodeH / 2 + 5);
+        text.setAttribute('text-anchor', 'middle');
+        text.setAttribute('fill', textColor);
+        text.setAttribute('font-size', '12');
+        text.setAttribute('font-weight', '900');
+        text.setAttribute('font-family', 'Inter, system-ui, sans-serif');
+        text.textContent = icon + ' ' + name;
+        svg.appendChild(text);
+
+        // Status indicator dot
+        const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        dot.setAttribute('cx', x + nodeW - 8);
+        dot.setAttribute('cy', y + 8);
+        dot.setAttribute('r', '5');
+        dot.setAttribute('fill', isFault ? '#ffffff' : (isAfter ? '#ffffff' : '#06d6a0'));
+        dot.setAttribute('stroke', '#000000');
+        dot.setAttribute('stroke-width', '1.5');
+        svg.appendChild(dot);
+      });
+
+      const style = document.createElementNS('http://www.w3.org/2000/svg', 'style');
+      style.textContent = '@keyframes dash-flow { to { stroke-dashoffset: -22; } }';
+      svg.appendChild(style);
+    }
+
+    function cliTerminalPrint(text, cssClass) {
+      const output = document.getElementById('cli-terminal-output');
+      const span = document.createElement('span');
+      span.className = 'terminal-output ' + (cssClass || '');
+      span.innerHTML = text + '\n';
+      output.appendChild(span);
+      output.scrollTop = output.scrollHeight;
+    }
+
+    function cliTerminalClear() {
+      document.getElementById('cli-terminal-output').innerHTML = '';
+    }
+
+    function cliProcessCommand(raw) {
+      const input = raw.trim().substring(0, 50);
+      if (!input) return;
+      const sc = cliGetCurrentScenario();
+      const parts = input.split(' ');
+      const cmd = parts[0].toLowerCase();
+      const args = parts.slice(1).join(' ');
+
+      cliTerminalPrint('C:\\> ' + input, 't-white');
+      playSound('packet');
+
+      if (cmd === 'cls' || cmd === 'clear') {
+        cliTerminalClear();
+        return;
+      }
+
+      if (cmd === 'help') {
+        cliTerminalPrint('Perintah tersedia:\n  ipconfig     - Tampilkan konfigurasi IP\n  ping [ip]    - Ping ke alamat IP\n  tracert [ip] - Trace route ke tujuan\n  netstat      - Tampilkan koneksi aktif\n  arp -a       - Tampilkan ARP table\n  cls / clear  - Bersihkan terminal\n  help         - Tampilkan bantuan ini', 't-cyan');
+        return;
+      }
+
+      if (cmd === 'ipconfig') {
+        cliTerminalPrint(sc.ipconfig, 't-green');
+        cliShowActionIfReady(cmd);
+        return;
+      }
+
+      if (cmd === 'ping') {
+        const ip = args || '192.168.1.1';
+        const isGateway = ip.includes('1.1') || ip.includes('1.254');
+        const result = isGateway ? sc.ping_gateway : sc.ping_server;
+        if (result === 'success') {
+          cliTerminalPrint('Reply from ' + ip + ': bytes=32 time=1ms TTL=64\nReply from ' + ip + ': bytes=32 time=1ms TTL=64\nReply from ' + ip + ': bytes=32 time=1ms TTL=64\n\nPing statistics for ' + ip + ':\n  Packets: Sent = 3, Received = 3, Lost = 0 (0% loss)', 't-green');
+        } else if (result === 'fail') {
+          cliTerminalPrint('Request timeout for icmp_seq 0\nRequest timeout for icmp_seq 1\nRequest timeout for icmp_seq 2\n\nPing statistics for ' + ip + ':\n  Packets: Sent = 3, Received = 0, Lost = 3 (100% loss)', 't-red');
+        } else {
+          cliTerminalPrint('Reply from ' + ip + ': bytes=32 time=1ms TTL=64\nRequest timeout for icmp_seq 1\nReply from ' + ip + ': bytes=32 time=5ms TTL=64\n\nIntermittent connectivity detected - possible IP conflict!', 't-amber');
+        }
+        cliShowActionIfReady(cmd);
+        return;
+      }
+
+      if (cmd === 'tracert' || cmd === 'traceroute') {
+        const ip = args || '10.0.0.2';
+        cliTerminalPrint('Tracing route to ' + ip + ':', 't-cyan');
+        sc.tracert.forEach((hop, i) => {
+          const isTimeout = hop.includes('*');
+          cliTerminalPrint('  ' + (i + 1) + '  ' + hop, isTimeout ? 't-red' : 't-green');
+        });
+        cliShowActionIfReady(cmd);
+        return;
+      }
+
+      if (cmd === 'netstat') {
+        cliTerminalPrint(sc.netstat, 't-green');
+        cliShowActionIfReady(cmd);
+        return;
+      }
+
+      if (cmd === 'arp') {
+        cliTerminalPrint('Interface: 192.168.1.x --- ARP Table:\n' + sc.arp, 't-green');
+        cliShowActionIfReady(cmd);
+        return;
+      }
+
+      cliTerminalPrint('command not found: ' + cmd + '. Type \'help\' for list.', 't-red');
+    }
+
+    function cliShowActionIfReady(triggeredCmd) {
+      if (cliState.diagnosisShown) return;
+      const triggers = ['ipconfig', 'ping', 'tracert', 'traceroute', 'netstat', 'arp'];
+      if (!triggers.includes(triggeredCmd)) return;
+      cliState.diagnosisShown = true;
+      cliTerminalPrint('\n[DIAGNOSIS] Berdasarkan hasil analisis, pilih tindakan perbaikan:', 't-amber');
+      const panel = document.getElementById('cli-action-panel');
+      panel.classList.add('visible');
+    }
+
+    function cliLoadScenario(sc) {
+      cliState.currentScenario = sc;
+      cliState.diagnosisShown = false;
+      document.getElementById('cli-action-panel').classList.remove('visible');
+      document.getElementById('cli-scenario-name').textContent = 'Misi ' + sc.id + ': ' + sc.name;
+      document.getElementById('cli-mission-desc').textContent = sc.description;
+      cliDrawTopology(sc.faultNode);
+      cliTerminalClear();
+      cliTerminalPrint('[SISTEM] Misi dimuat: ' + sc.name, 't-cyan');
+      cliTerminalPrint('[SISTEM] ' + sc.description, 't-amber');
+      cliTerminalPrint('[SISTEM] Ketik \'help\' untuk daftar perintah.\n', 't-green');
+
+      const opts = document.getElementById('cli-action-opts');
+      opts.innerHTML = '';
+      const shuffled = [...sc.options].sort(() => Math.random() - 0.5);
+      shuffled.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.className = 'action-opt';
+        btn.textContent = opt.text;
+        btn.addEventListener('click', () => cliHandleOption(btn, opt));
+        opts.appendChild(btn);
+      });
+    }
+
+    function cliHandleOption(btn, opt) {
+      const opts = document.querySelectorAll('.action-opt');
+      opts.forEach(b => b.disabled = true);
+      if (opt.correct) {
+        btn.classList.add('correct');
+        playSound('success');
+        addXP(cliState.currentScenario.xpReward);
+        cliState.score += cliState.currentScenario.xpReward;
+        cliTerminalPrint('\n[OK] Perbaikan berhasil! ' + cliState.currentScenario.diagnosis, 't-green');
+        state.streak += 1;
+        saveState();
+        updateHeader();
+        checkAchievement('first_blood');
+        safeSetTimeout(() => cliNextScenario(), 1500);
+      } else {
+        btn.classList.add('wrong');
+        playSound('error');
+        cliState.lives = Math.max(0, cliState.lives - 1);
+        cliUpdateLives();
+        cliTerminalPrint('\n[ERR] Tindakan salah! Nyawa berkurang. Diagnosis: ' + cliState.currentScenario.diagnosis, 't-red');
+        state.streak = 0;
+        saveState();
+        updateHeader();
+        if (cliState.lives <= 0) {
+          safeSetTimeout(() => cliEndGame(false), 1500);
+        } else {
+          safeSetTimeout(() => {
+            opts.forEach(b => { b.disabled = false; b.classList.remove('wrong'); });
+          }, 1500);
+        }
+      }
+    }
+
+    function cliUpdateLives() {
+      const container = document.getElementById('cli-lives');
+      container.innerHTML = '';
+      for (let i = 0; i < 3; i++) {
+        const span = document.createElement('span');
+        span.className = 'life-icon ' + (i >= cliState.lives ? 'lost' : '');
+        span.textContent = 'X';
+        container.appendChild(span);
+      }
+    }
+
+    function cliNextScenario() {
+      if (cliState.scenarioIndex >= cliState.scenarioOrder.length) {
+        cliEndGame(true);
+        return;
+      }
+      const sc = CLI_SCENARIOS[cliState.scenarioOrder[cliState.scenarioIndex]];
+      cliState.scenarioIndex++;
+      cliLoadScenario(sc);
+    }
+
+    function cliStartTimer() {
+      const display = document.getElementById('cli-timer');
+      cliState.timeLeft = 180;
+      const id = safeSetInterval(() => {
+        cliState.timeLeft--;
+        display.textContent = formatTime(cliState.timeLeft);
+        if (cliState.timeLeft <= 30) display.classList.add('urgent');
+        if (cliState.timeLeft <= 0) {
+          cliState.lives = Math.max(0, cliState.lives - 1);
+          cliState.timeLeft = 180;
+          display.classList.remove('urgent');
+          playSound('alarm');
+          cliTerminalPrint('[TIMEOUT] Waktu habis! Nyawa berkurang.', 't-red');
+          cliUpdateLives();
+          if (cliState.lives <= 0) {
+            clearInterval(id);
+            cliEndGame(false);
+          }
+        }
+      }, 1000);
+    }
+
+    function cliEndGame(won) {
+      clearAllTimers();
+      document.getElementById('cli-game').style.display = 'none';
+      const over = document.getElementById('cli-game-over');
+      over.classList.add('visible');
+      if (won) {
+        document.getElementById('cli-go-title').textContent = 'Semua Misi Selesai!';
+        document.getElementById('cli-go-desc').textContent = 'Total XP earned: ' + cliState.score + ' XP';
+        if (cliState.score > state.highScores.cli) {
+          state.highScores.cli = cliState.score;
+          saveState();
+        }
+        checkAchievement('first_blood');
+        playSound('levelup');
+      } else {
+        document.getElementById('cli-go-title').textContent = 'Game Over!';
+        document.getElementById('cli-go-desc').textContent = 'Nyawa habis. Skor: ' + cliState.score + ' XP';
+        playSound('error');
+      }
+    }
+
+    function cliInit() {
+      cliState.scenarioIndex = 0;
+      cliState.lives = 3;
+      cliState.score = 0;
+      cliState.timeLeft = 180;
+      cliState.diagnosisShown = false;
+      cliState.scenarioOrder = [0, 1, 2, 3, 4].sort(() => Math.random() - 0.5);
+      document.getElementById('cli-timer').classList.remove('urgent');
+      document.getElementById('cli-action-panel').classList.remove('visible');
+      cliUpdateLives();
+      document.getElementById('cli-game-over').classList.remove('visible');
+      document.getElementById('cli-game').style.display = 'block';
+      cliNextScenario();
+      cliStartTimer();
+    }
+
+    document.getElementById('cli-start-btn').addEventListener('click', () => {
+      document.getElementById('cli-start').style.display = 'none';
+      cliInit();
+    });
+
+    document.getElementById('cli-restart-btn').addEventListener('click', () => {
+      document.getElementById('cli-game-over').classList.remove('visible');
+      document.getElementById('cli-game').style.display = 'block';
+      cliInit();
+    });
+
+    document.getElementById('cli-input').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        const val = document.getElementById('cli-input').value;
+        cliProcessCommand(val);
+        document.getElementById('cli-input').value = '';
+      }
+    });
+
+    // ============================================================
+    //  GAME 2: CRIMPING SIMULATOR
+    // ============================================================
+    const WIRE_COLORS = [
+      { id: 'pw-o', label: 'Putih-Oranye', color: '#ff8c00', stripe: '#ffffff' },
+      { id: 'o', label: 'Oranye', color: '#ff6600', stripe: null },
+      { id: 'pw-h', label: 'Putih-Hijau', color: '#00cc44', stripe: '#ffffff' },
+      { id: 'b', label: 'Biru', color: '#0066cc', stripe: null },
+      { id: 'pb', label: 'Putih-Biru', color: '#3399ff', stripe: '#ffffff' },
+      { id: 'h', label: 'Hijau', color: '#009933', stripe: null },
+      { id: 'pw-c', label: 'Putih-Cokelat', color: '#c8651b', stripe: '#ffffff' },
+      { id: 'c', label: 'Cokelat', color: '#8b4513', stripe: null }
+    ];
+
+    const T568B = ['pw-o', 'o', 'pw-h', 'b', 'pb', 'h', 'pw-c', 'c'];
+    const T568A = ['pw-h', 'h', 'pw-o', 'b', 'pb', 'o', 'pw-c', 'c'];
+
+    let crimpState = {
+      mode: 'straight',
+      selectedWire: null,
+      slotsA: new Array(8).fill(null),
+      slotsB: new Array(8).fill(null),
+      crimped: false,
+      score: 0
+    };
+
+    function crimpWireById(id) {
+      return WIRE_COLORS.find(w => w.id === id);
+    }
+
+    function crimpGetExpected() {
+      if (crimpState.mode === 'straight') return { a: T568B, b: T568B };
+      if (crimpState.mode === 'crossover') return { a: T568A, b: T568B };
+      if (crimpState.mode === 'repair') return { a: T568B, b: T568B };
+      return { a: T568B, b: T568B };
+    }
+
+    function crimpRenderTray() {
+      const tray = document.getElementById('wire-tray');
+      tray.innerHTML = '';
+      const usedA = crimpState.slotsA.filter(Boolean);
+      const usedB = crimpState.slotsB.filter(Boolean);
+      WIRE_COLORS.forEach(wire => {
+        const countA = usedA.filter(id => id === wire.id).length;
+        const countB = usedB.filter(id => id === wire.id).length;
+        const used = (countA + countB) >= 2;
+        const chip = document.createElement('button');
+        chip.className = 'wire-chip' + (crimpState.selectedWire === wire.id ? ' selected' : '') + (used ? ' used' : '');
+        chip.disabled = used;
+        chip.setAttribute('aria-label', 'Kabel ' + wire.label);
+        chip.setAttribute('tabindex', '0');
+        const dot = document.createElement('div');
+        dot.className = 'wire-dot';
+        dot.style.background = wire.stripe
+          ? 'repeating-linear-gradient(45deg, #ffffff, #ffffff 4px, ' + wire.color + ' 4px, ' + wire.color + ' 8px)'
+          : wire.color;
+        chip.appendChild(dot);
+        const label = document.createElement('span');
+        label.textContent = wire.label;
+        chip.appendChild(label);
+        chip.addEventListener('click', () => {
+          if (used) return;
+          crimpState.selectedWire = crimpState.selectedWire === wire.id ? null : wire.id;
+          crimpRenderTray();
+        });
+        tray.appendChild(chip);
+      });
+    }
+
+    function crimpRenderSlots(side) {
+      const slots = side === 'a' ? crimpState.slotsA : crimpState.slotsB;
+      const container = document.getElementById('slots-' + side);
+      container.innerHTML = '';
+      slots.forEach((wireId, i) => {
+        const slot = document.createElement('div');
+        slot.className = 'slot' + (wireId ? ' filled' : '');
+        slot.setAttribute('tabindex', '0');
+        slot.setAttribute('aria-label', 'Pin ' + (i + 1) + (wireId ? ': ' + (crimpWireById(wireId) ? crimpWireById(wireId).label : wireId) : ': kosong'));
+        const pinNum = document.createElement('span');
+        pinNum.className = 'pin-num';
+        pinNum.textContent = i + 1;
+        slot.appendChild(pinNum);
+        if (wireId) {
+          const wire = crimpWireById(wireId);
+          if (wire) {
+            const stripe = document.createElement('div');
+            stripe.className = 'wire-stripe';
+            stripe.style.background = wire.stripe
+              ? 'repeating-linear-gradient(90deg, #ffffff, #ffffff 4px, ' + wire.color + ' 4px, ' + wire.color + ' 8px)'
+              : wire.color;
+            slot.appendChild(stripe);
+            slot.style.borderColor = wire.color;
+            const lbl = document.createElement('div');
+            lbl.className = 'wire-label';
+            lbl.textContent = wire.label.substring(0, 8);
+            slot.appendChild(lbl);
+          }
+        }
+        slot.addEventListener('click', () => {
+          if (crimpState.crimped) return;
+          if (wireId) {
+            if (side === 'a') crimpState.slotsA[i] = null;
+            else crimpState.slotsB[i] = null;
+            crimpRenderSlots(side);
+            crimpRenderTray();
+          } else if (crimpState.selectedWire) {
+            if (side === 'a') crimpState.slotsA[i] = crimpState.selectedWire;
+            else crimpState.slotsB[i] = crimpState.selectedWire;
+            crimpState.selectedWire = null;
+            crimpRenderSlots(side);
+            crimpRenderTray();
+          }
+          playSound('click');
+        });
+        slot.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); slot.click(); }
+        });
+        container.appendChild(slot);
+      });
+    }
+
+    function crimpSetMode(mode) {
+      crimpState.mode = mode;
+      crimpState.slotsA = new Array(8).fill(null);
+      crimpState.slotsB = new Array(8).fill(null);
+      crimpState.selectedWire = null;
+      crimpState.crimped = false;
+      document.getElementById('btn-test-cable').disabled = true;
+      document.getElementById('btn-crimp').disabled = false;
+      document.getElementById('crimp-crimped-label').style.display = 'none';
+      document.getElementById('tester-result').textContent = '';
+      document.querySelectorAll('.led').forEach(l => { l.className = 'led'; });
+
+      const labels = {
+        straight: { a: 'Sisi A (T568B)', b: 'Sisi B (T568B)', ta: 'Target: PO-O-PH-B-PB-H-PC-C', tb: 'Target: PO-O-PH-B-PB-H-PC-C' },
+        crossover: { a: 'Sisi A (T568A)', b: 'Sisi B (T568B)', ta: 'Target: PH-H-PO-B-PB-O-PC-C', tb: 'Target: PO-O-PH-B-PB-H-PC-C' },
+        repair: { a: 'Sisi A (perbaiki)', b: 'Sisi B (referensi T568B)', ta: 'Temukan dan perbaiki pin yang salah', tb: 'Referensi: PO-O-PH-B-PB-H-PC-C' }
+      };
+
+      document.getElementById('side-a-label').textContent = labels[mode].a;
+      document.getElementById('side-b-label').textContent = labels[mode].b;
+      document.getElementById('side-a-target').textContent = labels[mode].ta;
+      document.getElementById('side-b-target').textContent = labels[mode].tb;
+
+      if (mode === 'repair') {
+        const broken = [...T568B];
+        const swap1 = Math.floor(Math.random() * 8);
+        const swap2 = (swap1 + 1 + Math.floor(Math.random() * 3)) % 8;
+        const tmp = broken[swap1];
+        broken[swap1] = broken[swap2];
+        broken[swap2] = tmp;
+        crimpState.slotsA = [...broken];
+        crimpState.slotsB = [...T568B];
+      }
+
+      crimpRenderTray();
+      crimpRenderSlots('a');
+      crimpRenderSlots('b');
+    }
+
+    document.getElementById('btn-crimp').addEventListener('click', () => {
+      const allFilled = crimpState.slotsA.every(Boolean) && crimpState.slotsB.every(Boolean);
+      if (!allFilled) {
+        showToast('Isi semua slot terlebih dahulu!', 'error');
+        return;
+      }
+      crimpState.crimped = true;
+      document.getElementById('btn-test-cable').disabled = false;
+      document.getElementById('btn-crimp').disabled = true;
+      document.getElementById('crimp-crimped-label').style.display = 'block';
+      playSound('success');
+      showToast('Kabel dikrimping! Jalankan test.', 'success');
+    });
+
+    document.getElementById('btn-test-cable').addEventListener('click', () => {
+      const expected = crimpGetExpected();
+      const leds = document.querySelectorAll('.led');
+      leds.forEach(l => { l.className = 'led'; });
+      document.getElementById('tester-result').textContent = '';
+
+      let pinResults = [];
+      for (let i = 0; i < 8; i++) {
+        const correctA = crimpState.slotsA[i] === expected.a[i];
+        const correctB = crimpState.slotsB[i] === expected.b[i];
+        pinResults.push(correctA && correctB);
+      }
+
+      let idx = 0;
+      const id = setInterval(() => {
+        if (idx >= 8) {
+          clearInterval(id);
+          const allPass = pinResults.every(Boolean);
+          const isT568A_A = crimpState.slotsA.join(',') === T568A.join(',');
+          const isT568B_B = crimpState.slotsB.join(',') === T568B.join(',');
+          const isCross = isT568A_A && isT568B_B;
+
+          const result = document.getElementById('tester-result');
+          if (allPass) {
+            result.textContent = 'PASS - Kabel berhasil dikrimping dengan benar!';
+            result.className = 'tester-result pass';
+            playSound('success');
+            let xpGain = crimpState.mode === 'straight' ? 100 : crimpState.mode === 'crossover' ? 120 : 150;
+            addXP(xpGain);
+            crimpState.score += xpGain;
+            document.getElementById('crimp-score-label').textContent = 'Skor: ' + crimpState.score;
+            checkAchievement('first_blood');
+            checkAchievement('cable_master');
+            if (crimpState.score > state.highScores.crimping) {
+              state.highScores.crimping = crimpState.score;
+              saveState();
+            }
+          } else if (isCross) {
+            result.textContent = 'CROSS - Terdeteksi kabel crossover!';
+            result.className = 'tester-result cross';
+            playSound('error');
+          } else {
+            const wrongPins = pinResults.map((ok, i) => ok ? '' : (i + 1)).filter(Boolean);
+            result.textContent = 'FAIL - Pin salah: ' + wrongPins.join(', ');
+            result.className = 'tester-result fail';
+            playSound('error');
+            const penalty = Math.min(20, crimpState.score);
+            crimpState.score -= penalty;
+            state.totalScore = Math.max(0, state.totalScore - penalty);
+            document.getElementById('crimp-score-label').textContent = 'Skor: ' + crimpState.score;
+          }
+          return;
+        }
+        const led = leds[idx];
+        led.className = 'led ' + (pinResults[idx] ? 'on-green' : 'on-red');
+        playSound('packet');
+        idx++;
+      }, 200);
+    });
+
+    document.getElementById('btn-crimp-reset').addEventListener('click', () => {
+      crimpSetMode(crimpState.mode);
+      playSound('click');
+    });
+
+    document.querySelectorAll('.crimp-mode-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.crimp-mode-btn').forEach(b => {
+          b.classList.toggle('active', b === btn);
+          b.setAttribute('aria-pressed', b === btn ? 'true' : 'false');
+        });
+        crimpSetMode(btn.dataset.mode);
+        playSound('click');
+      });
+    });
+
+    crimpSetMode('straight');
+
+    // ============================================================
+    //  GAME 3: SUBNETTING BLITZ
+    // ============================================================
+    function cidrToMask(cidr) {
+      const mask = [];
+      for (let i = 0; i < 4; i++) {
+        const bits = Math.min(8, Math.max(0, cidr - i * 8));
+        mask.push(256 - Math.pow(2, 8 - bits));
+      }
+      return mask.join('.');
+    }
+
+    function maskToInt(mask) {
+      return mask.split('.').reduce((acc, oct) => (acc << 8) + parseInt(oct), 0) >>> 0;
+    }
+
+    function intToIp(n) {
+      return [(n >>> 24) & 0xFF, (n >>> 16) & 0xFF, (n >>> 8) & 0xFF, n & 0xFF].join('.');
+    }
+
+    function ipToInt(ip) {
+      return ip.split('.').reduce((acc, oct) => (acc << 8) + parseInt(oct), 0) >>> 0;
+    }
+
+    function generateSubnetQuestion() {
+      const cidrs = [24, 25, 26, 27, 28, 29, 30, 22, 23, 20, 16];
+      const cidr = cidrs[Math.floor(Math.random() * cidrs.length)];
+      let ip;
+      if (cidr >= 24) {
+        ip = '192.168.' + Math.floor(Math.random() * 255) + '.' + Math.floor(Math.random() * 254 + 1);
+      } else if (cidr >= 16) {
+        ip = '10.' + Math.floor(Math.random() * 255) + '.' + Math.floor(Math.random() * 255) + '.' + Math.floor(Math.random() * 254 + 1);
+      } else {
+        ip = '172.' + (16 + Math.floor(Math.random() * 16)) + '.' + Math.floor(Math.random() * 255) + '.' + Math.floor(Math.random() * 254 + 1);
+      }
+      const subnetMask = cidrToMask(cidr);
+      const ipInt = ipToInt(ip);
+      const maskInt = maskToInt(subnetMask);
+      const networkInt = (ipInt & maskInt) >>> 0;
+      const broadcastInt = (networkInt | (~maskInt >>> 0)) >>> 0;
+      const networkId = intToIp(networkInt);
+      const broadcastId = intToIp(broadcastInt);
+      const usableHosts = Math.max(0, Math.pow(2, 32 - cidr) - 2);
+      return { ip, cidr, networkId, broadcastId, usableHosts, subnetMask };
+    }
+
+    let subnetState = {
+      active: false,
+      currentQ: null,
+      score: 0,
+      combo: 1,
+      comboCount: 0,
+      timeLeft: 30,
+      timerInterval: null,
+      correctCount: 0,
+      startTime: null
+    };
+
+    function subnetLoadQuestion() {
+      subnetState.currentQ = generateSubnetQuestion();
+      subnetState.timeLeft = 30;
+      document.getElementById('subnet-question').textContent = subnetState.currentQ.ip + ' / ' + subnetState.currentQ.cidr;
+      document.getElementById('f-networkid').value = '';
+      document.getElementById('f-broadcast').value = '';
+      document.getElementById('f-hosts').value = '';
+      document.getElementById('f-mask').value = '';
+      ['f-networkid', 'f-broadcast', 'f-hosts', 'f-mask'].forEach(id => {
+        document.getElementById(id).className = 'field-input text-mono';
+      });
+      document.getElementById('subnet-explanation').className = 'explanation-panel';
+      document.getElementById('subnet-explanation').textContent = '';
+      document.getElementById('subnet-next-btn').style.display = 'none';
+      document.getElementById('subnet-submit-btn').style.display = '';
+      document.getElementById('subnet-timer-fill').style.width = '100%';
+      document.getElementById('subnet-timer-fill').style.background = 'var(--cyan)';
+    }
+
+    function subnetStartTimer() {
+      if (subnetState.timerInterval) clearInterval(subnetState.timerInterval);
+      subnetState.timerInterval = safeSetInterval(() => {
+        subnetState.timeLeft--;
+        const pct = (subnetState.timeLeft / 30) * 100;
+        document.getElementById('subnet-timer-fill').style.width = pct + '%';
+        document.getElementById('subnet-timer').textContent = '00:' + subnetState.timeLeft.toString().padStart(2, '0');
+        if (subnetState.timeLeft <= 10) {
+          document.getElementById('subnet-timer-fill').style.background = 'var(--red)';
+          document.getElementById('subnet-timer').classList.add('urgent');
+        }
+        if (subnetState.timeLeft <= 0) {
+          clearInterval(subnetState.timerInterval);
+          subnetHandleTimeout();
+        }
+      }, 1000);
+    }
+
+    function subnetHandleTimeout() {
+      const q = subnetState.currentQ;
+      playSound('error');
+      subnetState.combo = 1;
+      subnetState.comboCount = 0;
+      document.getElementById('subnet-combo').textContent = 'x1';
+      ['f-networkid', 'f-broadcast', 'f-hosts', 'f-mask'].forEach(id => {
+        document.getElementById(id).classList.add('wrong');
+      });
+      subnetShowExplanation(q, false);
+    }
+
+    function subnetHandleSubmit() {
+      if (!subnetState.currentQ) return;
+      if (subnetState.timerInterval) clearInterval(subnetState.timerInterval);
+      document.getElementById('subnet-timer').classList.remove('urgent');
+      const q = subnetState.currentQ;
+      const fNetwork = document.getElementById('f-networkid').value.trim();
+      const fBroadcast = document.getElementById('f-broadcast').value.trim();
+      const fHosts = document.getElementById('f-hosts').value.trim();
+      const fMask = document.getElementById('f-mask').value.trim();
+
+      const correctNetwork = fNetwork === q.networkId;
+      const correctBroadcast = fBroadcast === q.broadcastId;
+      const correctHosts = parseInt(fHosts) === q.usableHosts || fHosts === q.usableHosts.toString();
+      const correctMask = fMask === q.subnetMask;
+
+      document.getElementById('f-networkid').classList.toggle('correct', correctNetwork);
+      document.getElementById('f-networkid').classList.toggle('wrong', !correctNetwork);
+      document.getElementById('f-broadcast').classList.toggle('correct', correctBroadcast);
+      document.getElementById('f-broadcast').classList.toggle('wrong', !correctBroadcast);
+      document.getElementById('f-hosts').classList.toggle('correct', correctHosts);
+      document.getElementById('f-hosts').classList.toggle('wrong', !correctHosts);
+      document.getElementById('f-mask').classList.toggle('correct', correctMask);
+      document.getElementById('f-mask').classList.toggle('wrong', !correctMask);
+
+      const allCorrect = correctNetwork && correctBroadcast && correctHosts && correctMask;
+
+      if (allCorrect) {
+        playSound('success');
+        subnetState.comboCount++;
+        if (subnetState.comboCount >= 5) subnetState.combo = 3;
+        else if (subnetState.comboCount >= 3) subnetState.combo = 2;
+        else subnetState.combo = 1;
+        document.getElementById('subnet-combo').textContent = 'x' + subnetState.combo;
+        const timeBonus = subnetState.timeLeft * 2;
+        const xpGained = (100 * subnetState.combo) + timeBonus;
+        subnetState.score += xpGained;
+        subnetState.correctCount++;
+        document.getElementById('subnet-score').textContent = subnetState.score;
+        addXP(xpGained);
+        checkAchievement('first_blood');
+        if (subnetState.score >= 500) checkAchievement('subnetter_pro');
+        const elapsed = (Date.now() - subnetState.startTime) / 1000;
+        if (elapsed < 60 && subnetState.correctCount >= 5) checkAchievement('speed_demon');
+        if (subnetState.score > state.highScores.subnetting) {
+          state.highScores.subnetting = subnetState.score;
+          saveState();
+        }
+      } else {
+        playSound('error');
+        subnetState.comboCount = 0;
+        subnetState.combo = 1;
+        document.getElementById('subnet-combo').textContent = 'x1';
+      }
+
+      subnetShowExplanation(q, allCorrect);
+    }
+
+    function subnetShowExplanation(q, correct) {
+      const maskBin = q.subnetMask.split('.').map(o => parseInt(o).toString(2).padStart(8, '0')).join('.');
+      const explanation = 'Pembahasan:\nIP: ' + q.ip + ' | CIDR: /' + q.cidr + '\nSubnet Mask: ' + q.subnetMask + '\n(' + maskBin + ')\nNetwork ID: ' + q.networkId + '\nBroadcast: ' + q.broadcastId + '\nUsable Hosts: ' + q.usableHosts;
+      const panel = document.getElementById('subnet-explanation');
+      panel.textContent = explanation;
+      panel.classList.add('visible');
+      panel.style.borderColor = correct ? 'var(--green)' : 'var(--red)';
+      document.getElementById('subnet-next-btn').style.display = '';
+      document.getElementById('subnet-submit-btn').style.display = 'none';
+
+      if (correct) {
+        safeSetTimeout(() => {
+          if (document.getElementById('subnet-next-btn').style.display !== 'none') {
+            subnetLoadQuestion();
+            subnetStartTimer();
+          }
+        }, 2000);
+      }
+    }
+
+    function subnetInit() {
+      subnetState.score = 0;
+      subnetState.combo = 1;
+      subnetState.comboCount = 0;
+      subnetState.correctCount = 0;
+      subnetState.startTime = Date.now();
+      document.getElementById('subnet-score').textContent = '0';
+      document.getElementById('subnet-combo').textContent = 'x1';
+      document.getElementById('subnet-timer').classList.remove('urgent');
+      document.getElementById('subnet-game-over').classList.remove('visible');
+      document.getElementById('subnet-game').style.display = 'block';
+      subnetLoadQuestion();
+      subnetStartTimer();
+    }
+
+    document.getElementById('subnet-start-btn').addEventListener('click', () => {
+      document.getElementById('subnet-start').style.display = 'none';
+      subnetInit();
+    });
+
+    document.getElementById('subnet-submit-btn').addEventListener('click', subnetHandleSubmit);
+
+    document.getElementById('subnet-next-btn').addEventListener('click', () => {
+      subnetLoadQuestion();
+      subnetStartTimer();
+    });
+
+    document.getElementById('subnet-restart-btn').addEventListener('click', () => {
+      subnetInit();
+    });
+
+    document.getElementById('subnet-binary-toggle').addEventListener('click', () => {
+      const table = document.getElementById('binary-table');
+      const btn = document.getElementById('subnet-binary-toggle');
+      const visible = table.classList.toggle('visible');
+      btn.textContent = visible ? 'Bantuan Biner ▲' : 'Bantuan Biner ▼';
+    });
+
+    ['f-networkid', 'f-broadcast', 'f-hosts', 'f-mask'].forEach(id => {
+      document.getElementById(id).addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') subnetHandleSubmit();
+      });
+    });
+
+    // ============================================================
+    //  GAME 4: LINUX DEFENSE
+    // ============================================================
+    const ATTACK_TYPES = [
+      { type: 'ddos', port: 80, severity: 'CRIT', msg: 'DDoS flood detected on port 80 from {ip}', fix_type: 'deny_port_ip', fix_port: 80, damage: 15 },
+      { type: 'ssh_brute', port: 22, severity: 'WARN', msg: 'SSH brute-force from {ip} ({attempts} attempts)', fix_type: 'deny_port_ip', fix_port: 22, damage: 10 },
+      { type: 'port_scan', port: null, severity: 'WARN', msg: 'Port scan detected from {ip}', fix_type: 'deny_ip', fix_port: null, damage: 5 },
+      { type: 'legit_http', port: 80, severity: 'INFO', msg: 'Legitimate HTTP request from {ip}', fix_type: null, damage: 0 },
+      { type: 'legit_https', port: 443, severity: 'INFO', msg: 'HTTPS connection from {ip}', fix_type: null, damage: 0 }
+    ];
+
+    const WAVE_INTERVALS = [4000, 3000, 2500, 2000, 1500];
+
+    function randomIP() {
+      return Math.floor(Math.random() * 200 + 10) + '.' + Math.floor(Math.random() * 255) + '.' +
+        Math.floor(Math.random() * 255) + '.' + Math.floor(Math.random() * 254 + 1);
+    }
+
+    let linuxState = {
+      active: false,
+      hp: 100,
+      wave: 1,
+      waveTime: 60,
+      waveInterval: null,
+      attackInterval: null,
+      activeAttacks: [],
+      rules: [],
+      xpEarned: 0,
+      blockedPorts: new Set(),
+      blockedIPs: new Set(),
+      score: 0,
+      pid: 1000
+    };
+
+    function linuxLog(msg, level) {
+      const log = document.getElementById('attack-log');
+      const now = new Date();
+      const ts = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0') + ':' + now.getSeconds().toString().padStart(2, '0');
+      const entry = document.createElement('div');
+      entry.className = 'log-entry ' + level;
+      entry.textContent = '[' + ts + '] ' + level.toUpperCase() + ': ' + msg;
+      log.appendChild(entry);
+      log.scrollTop = log.scrollHeight;
+    }
+
+    function linuxUpdateHPBar() {
+      const fill = document.getElementById('linux-hp-fill');
+      const val = document.getElementById('linux-hp-val');
+      val.textContent = Math.round(linuxState.hp);
+      fill.style.width = Math.max(0, linuxState.hp) + '%';
+      if (linuxState.hp > 60) fill.style.background = 'var(--green)';
+      else if (linuxState.hp > 30) fill.style.background = 'var(--amber)';
+      else fill.style.background = 'var(--red)';
+      if (linuxState.hp <= 0) linuxEndGame(false);
+    }
+
+    function linuxUpdateRules() {
+      const panel = document.getElementById('active-rules');
+      if (linuxState.rules.length === 0) {
+        panel.textContent = 'Belum ada rule aktif.';
+        return;
+      }
+      panel.textContent = linuxState.rules.join('\n');
+    }
+
+    function linuxUpdateWaves() {
+      const container = document.getElementById('linux-waves');
+      container.innerHTML = '';
+      for (let i = 1; i <= 5; i++) {
+        const dot = document.createElement('div');
+        dot.className = 'wave-dot' + (i < linuxState.wave ? ' done' : i === linuxState.wave ? ' active' : '');
+        container.appendChild(dot);
+      }
+      container.insertAdjacentText('afterbegin', 'Wave ' + linuxState.wave + '/5 ');
+    }
+
+    function linuxSpawnAttack() {
+      const ip = randomIP();
+      const pidVal = linuxState.pid++;
+      const legitTypes = ATTACK_TYPES.filter(a => a.type.startsWith('legit'));
+      const attackTypes = ATTACK_TYPES.filter(a => !a.type.startsWith('legit'));
+      const isLegit = Math.random() < 0.3;
+      const pool = isLegit ? legitTypes : attackTypes;
+      const tpl = pool[Math.floor(Math.random() * pool.length)];
+
+      const attempts = Math.floor(Math.random() * 1000 + 100);
+      const msg = tpl.msg.replace('{ip}', ip).replace('{attempts}', attempts) + ' [PID:' + pidVal + ']';
+      linuxLog(msg, tpl.severity.toLowerCase());
+
+      if (!isLegit) {
+        playSound(tpl.severity === 'CRIT' ? 'alarm' : 'packet');
+        const attack = { id: pidVal, ip, type: tpl.type, port: tpl.fix_port, fix_type: tpl.fix_type, damage: tpl.damage, blocked: false };
+        linuxState.activeAttacks.push(attack);
+        safeSetTimeout(() => {
+          if (!attack.blocked) {
+            const isPortBlocked = attack.port && linuxState.blockedPorts.has(attack.port);
+            const isIPBlocked = linuxState.blockedIPs.has(ip);
+            if (!isPortBlocked && !isIPBlocked) {
+              linuxState.hp -= tpl.damage;
+              linuxLog('Damage taken! HP -' + tpl.damage + ' from unblocked ' + tpl.type + ' (PID:' + pidVal + ')', 'crit');
+              linuxUpdateHPBar();
+            }
+          }
+          linuxState.activeAttacks = linuxState.activeAttacks.filter(a => a.id !== pidVal);
+        }, 5000);
+      }
+    }
+
+    function linuxExecCommand(raw) {
+      const cmd = raw.trim().substring(0, 80);
+      if (!cmd) return;
+      linuxLog('$ ' + cmd, 'sys');
+      playSound('click');
+
+      const parts = cmd.split(/\s+/);
+      const base = parts[0];
+
+      if (base === 'ufw') {
+        const action = parts[1];
+        if (action === 'deny') {
+          if (parts[2] === 'from' && parts[3]) {
+            const ip = parts[3];
+            linuxState.blockedIPs.add(ip);
+            linuxState.rules.push('ufw deny from ' + ip);
+            linuxLog('Rule added: deny all from ' + ip, 'sys');
+            linuxBlockByIP(ip);
+            linuxUpdateRules();
+          } else if (parts[2] && !isNaN(parseInt(parts[2])) && parts[3] === 'from' && parts[4]) {
+            const port = parseInt(parts[2]);
+            const ip = parts[4];
+            linuxState.blockedPorts.add(port);
+            linuxState.blockedIPs.add(ip);
+            linuxState.rules.push('ufw deny ' + port + ' from ' + ip);
+            linuxLog('Rule added: deny port ' + port + ' from ' + ip, 'sys');
+            linuxBlockByPortAndIP(port, ip);
+            linuxUpdateRules();
+          } else if (parts[2] && !isNaN(parseInt(parts[2]))) {
+            const port = parseInt(parts[2]);
+            const legitOnPort = linuxState.activeAttacks.some(a => a.type.startsWith('legit') && a.port === port);
+            if (port === 80 || port === 443) {
+              linuxLog('WARNING: Blocking port ' + port + ' may disrupt legitimate traffic!', 'warn');
+            }
+            linuxState.blockedPorts.add(port);
+            linuxState.rules.push('ufw deny ' + port);
+            linuxLog('Rule added: deny port ' + port, 'sys');
+            linuxBlockByPort(port);
+            linuxUpdateRules();
+          } else {
+            linuxLog('Usage: ufw deny [port] | ufw deny [port] from [ip] | ufw deny from [ip]', 'warn');
+          }
+        } else if (action === 'allow') {
+          const port = parseInt(parts[2]);
+          if (!isNaN(port)) {
+            linuxState.blockedPorts.delete(port);
+            linuxState.rules.push('ufw allow ' + port);
+            linuxLog('Rule added: allow port ' + port, 'sys');
+            linuxUpdateRules();
+          }
+        } else if (action === 'status') {
+          linuxLog('UFW Status: Active\n' + (linuxState.rules.length ? linuxState.rules.join('\n') : 'No rules set.'), 'sys');
+        } else {
+          linuxLog('Unknown ufw command. Try: ufw deny [port], ufw allow [port], ufw status', 'warn');
+        }
+        return;
+      }
+
+      if (base === 'systemctl') {
+        const action2 = parts[1];
+        const service = parts[2];
+        if (action2 === 'restart') {
+          if (service === 'nginx') {
+            linuxState.hp = Math.min(100, linuxState.hp + 10);
+            linuxLog('nginx restarted. HP +10', 'sys');
+            linuxUpdateHPBar();
+            playSound('success');
+          } else if (service === 'ssh') {
+            linuxState.hp = Math.min(100, linuxState.hp + 5);
+            linuxLog('SSH service restarted. HP +5', 'sys');
+            linuxUpdateHPBar();
+            playSound('success');
+          } else {
+            linuxLog('Service not found: ' + (service || ''), 'warn');
+          }
+        } else {
+          linuxLog('Usage: systemctl restart [nginx|ssh]', 'warn');
+        }
+        return;
+      }
+
+      if (base === 'kill') {
+        const force = parts[1] === '-9';
+        const pidStr = force ? parts[2] : parts[1];
+        const pid = parseInt(pidStr);
+        if (isNaN(pid)) {
+          linuxLog('Usage: kill [pid] | kill -9 [pid]', 'warn');
+          return;
+        }
+        const attack = linuxState.activeAttacks.find(a => a.id === pid);
+        if (attack) {
+          attack.blocked = true;
+          linuxState.activeAttacks = linuxState.activeAttacks.filter(a => a.id !== pid);
+          linuxState.xpEarned += 20;
+          document.getElementById('linux-xp-label').textContent = 'XP Earned: ' + linuxState.xpEarned;
+          addXP(20);
+          linuxLog('Process ' + pid + ' killed. Attack blocked. +20 XP', 'sys');
+          playSound('success');
+        } else {
+          linuxLog('No active attack with PID ' + pid, 'warn');
+        }
+        return;
+      }
+
+      if (base === 'chmod' && parts[1] === '600' && parts[2] && parts[2].includes('ssh')) {
+        linuxState.rules.push('chmod 600 /etc/ssh/sshd_config');
+        linuxLog('SSH hardened: sshd_config permissions set to 600. SSH brute-force damage -50%.', 'sys');
+        linuxUpdateRules();
+        playSound('success');
+        return;
+      }
+
+      linuxLog('Command not found: ' + base + '. Try: ufw, systemctl, kill, chmod', 'warn');
+    }
+
+    function linuxBlockByPort(port) {
+      linuxState.activeAttacks.forEach(a => {
+        if (a.port === port && !a.blocked) {
+          a.blocked = true;
+          linuxState.xpEarned += 20;
+          linuxState.score += 20;
+          addXP(20);
+          linuxLog('Attack blocked: PID ' + a.id + ' port ' + port + ' +20 XP', 'sys');
+        }
+      });
+      document.getElementById('linux-xp-label').textContent = 'XP Earned: ' + linuxState.xpEarned;
+    }
+
+    function linuxBlockByIP(ip) {
+      linuxState.activeAttacks.forEach(a => {
+        if (a.ip === ip && !a.blocked) {
+          a.blocked = true;
+          linuxState.xpEarned += 20;
+          linuxState.score += 20;
+          addXP(20);
+          linuxLog('Attack blocked: PID ' + a.id + ' from ' + ip + ' +20 XP', 'sys');
+        }
+      });
+      document.getElementById('linux-xp-label').textContent = 'XP Earned: ' + linuxState.xpEarned;
+    }
+
+    function linuxBlockByPortAndIP(port, ip) {
+      linuxState.activeAttacks.forEach(a => {
+        if (a.ip === ip && a.port === port && !a.blocked) {
+          a.blocked = true;
+          linuxState.xpEarned += 20;
+          linuxState.score += 20;
+          addXP(20);
+          linuxLog('Attack blocked: PID ' + a.id + ' port ' + port + ' from ' + ip + ' +20 XP', 'sys');
+        }
+      });
+      document.getElementById('linux-xp-label').textContent = 'XP Earned: ' + linuxState.xpEarned;
+    }
+
+    function linuxStartWave() {
+      linuxLog('=== WAVE ' + linuxState.wave + ' STARTED ===', 'sys');
+      linuxUpdateWaves();
+      const interval = WAVE_INTERVALS[linuxState.wave - 1];
+      linuxState.waveTime = 60;
+      document.getElementById('linux-timer').textContent = linuxState.waveTime;
+
+      if (linuxState.attackInterval) clearInterval(linuxState.attackInterval);
+      linuxState.attackInterval = safeSetInterval(() => {
+        if (linuxState.active) linuxSpawnAttack();
+      }, interval);
+
+      if (linuxState.waveInterval) clearInterval(linuxState.waveInterval);
+      linuxState.waveInterval = safeSetInterval(() => {
+        linuxState.waveTime--;
+        document.getElementById('linux-timer').textContent = linuxState.waveTime;
+        if (linuxState.waveTime <= 0) {
+          clearInterval(linuxState.waveInterval);
+          clearInterval(linuxState.attackInterval);
+          linuxLog('=== WAVE ' + linuxState.wave + ' CLEARED! +50 XP ===', 'sys');
+          playSound('success');
+          addXP(50);
+          linuxState.xpEarned += 50;
+          document.getElementById('linux-xp-label').textContent = 'XP Earned: ' + linuxState.xpEarned;
+          if (linuxState.wave >= 3) checkAchievement('defender');
+          if (linuxState.wave >= 5) {
+            linuxEndGame(true);
+            return;
+          }
+          linuxState.wave++;
+          safeSetTimeout(() => linuxStartWave(), 1500);
+        }
+      }, 1000);
+    }
+
+    function linuxEndGame(won) {
+      clearAllTimers();
+      linuxState.active = false;
+      document.getElementById('linux-game').style.display = 'none';
+      const over = document.getElementById('linux-game-over');
+      over.classList.add('visible');
+      if (won) {
+        document.getElementById('linux-go-title').textContent = 'Server Bertahan!';
+        document.getElementById('linux-go-desc').textContent = 'Semua 5 wave berhasil dihalau! XP earned: ' + linuxState.xpEarned;
+        addXP(200);
+        checkAchievement('first_blood');
+        if (linuxState.score > state.highScores.linux) {
+          state.highScores.linux = linuxState.score;
+          saveState();
+        }
+        playSound('levelup');
+      } else {
+        document.getElementById('linux-go-title').textContent = 'Server Down!';
+        document.getElementById('linux-go-desc').textContent = 'HP habis di Wave ' + linuxState.wave + '. XP earned: ' + linuxState.xpEarned;
+        playSound('error');
+      }
+    }
+
+    function linuxInit() {
+      linuxState.active = true;
+      linuxState.hp = 100;
+      linuxState.wave = 1;
+      linuxState.activeAttacks = [];
+      linuxState.rules = [];
+      linuxState.xpEarned = 0;
+      linuxState.score = 0;
+      linuxState.pid = 1000;
+      linuxState.blockedPorts = new Set();
+      linuxState.blockedIPs = new Set();
+      document.getElementById('attack-log').innerHTML = '';
+      document.getElementById('active-rules').textContent = 'Belum ada rule aktif.';
+      document.getElementById('linux-xp-label').textContent = 'XP Earned: 0';
+      linuxUpdateHPBar();
+      linuxUpdateWaves();
+      document.getElementById('linux-game-over').classList.remove('visible');
+      document.getElementById('linux-game').style.display = 'block';
+      linuxLog('Server online. Sistem pertahanan aktif.', 'sys');
+      linuxStartWave();
+    }
+
+    document.getElementById('linux-start-btn').addEventListener('click', () => {
+      document.getElementById('linux-start').style.display = 'none';
+      linuxInit();
+    });
+
+    document.getElementById('linux-restart-btn').addEventListener('click', () => {
+      document.getElementById('linux-game-over').classList.remove('visible');
+      linuxInit();
+    });
+
+    document.getElementById('linux-cmd-submit').addEventListener('click', () => {
+      const val = document.getElementById('linux-cmd-input').value;
+      linuxExecCommand(val);
+      document.getElementById('linux-cmd-input').value = '';
+    });
+
+    document.getElementById('linux-cmd-input').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        linuxExecCommand(document.getElementById('linux-cmd-input').value);
+        document.getElementById('linux-cmd-input').value = '';
+      }
+    });
+
+    document.querySelectorAll('.quick-cmd-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        let cmd = btn.dataset.cmd;
+        const lastAttack = linuxState.activeAttacks.filter(a => !a.blocked).slice(-1)[0];
+        if (lastAttack) {
+          cmd = cmd.replace('{ip}', lastAttack.ip);
+        } else {
+          cmd = cmd.replace('{ip}', '0.0.0.0');
+        }
+        linuxExecCommand(cmd);
+        playSound('click');
+      });
+    });
+
+    // ============================================================
+    //  GAME 5: PORT & OSI QUIZ
+    // ============================================================
+    const QUIZ_QUESTIONS = [
+      { q: 'Port 21 digunakan oleh protokol apa?', options: ['FTP', 'SSH', 'Telnet', 'SMTP'], correct: 0 },
+      { q: 'Port 22 digunakan oleh?', options: ['FTP', 'SSH', 'HTTP', 'POP3'], correct: 1 },
+      { q: 'Port 23 adalah port untuk?', options: ['SSH', 'FTP', 'Telnet', 'SMTP'], correct: 2 },
+      { q: 'Port 25 digunakan untuk?', options: ['HTTP', 'SMTP', 'POP3', 'IMAP'], correct: 1 },
+      { q: 'Port 53 adalah port untuk?', options: ['DHCP', 'DNS', 'SNMP', 'NTP'], correct: 1 },
+      { q: 'Port 80 digunakan oleh?', options: ['HTTPS', 'HTTP', 'FTP', 'SMTP'], correct: 1 },
+      { q: 'Port 110 adalah port untuk?', options: ['IMAP', 'POP3', 'SMTP', 'HTTP'], correct: 1 },
+      { q: 'Port 143 digunakan untuk?', options: ['POP3', 'SMTP', 'IMAP', 'FTP'], correct: 2 },
+      { q: 'Port 443 adalah port untuk?', options: ['HTTP', 'FTP', 'HTTPS', 'SSH'], correct: 2 },
+      { q: 'Port 3306 digunakan oleh?', options: ['PostgreSQL', 'MySQL', 'MongoDB', 'Redis'], correct: 1 },
+      { q: 'Port 3389 adalah port untuk?', options: ['VNC', 'SSH', 'RDP (Remote Desktop)', 'Telnet'], correct: 2 },
+      { q: 'Port 67/68 digunakan oleh?', options: ['DNS', 'DHCP', 'NTP', 'SNMP'], correct: 1 },
+      { q: 'Port 161 adalah port untuk?', options: ['SNMP', 'LDAP', 'NTP', 'Syslog'], correct: 0 },
+      { q: 'Port 514 digunakan oleh?', options: ['SNMP', 'NTP', 'Syslog', 'LDAP'], correct: 2 },
+      { q: 'Port 389 adalah port untuk?', options: ['LDAP', 'Kerberos', 'RADIUS', 'TACACS+'], correct: 0 },
+      { q: 'Layer OSI mana yang bertanggung jawab untuk routing paket?', options: ['Data Link (L2)', 'Network (L3)', 'Transport (L4)', 'Session (L5)'], correct: 1 },
+      { q: 'HTTP dan HTTPS berada di layer OSI mana?', options: ['Transport (L4)', 'Session (L5)', 'Presentation (L6)', 'Application (L7)'], correct: 3 },
+      { q: 'MAC Address beroperasi di layer OSI mana?', options: ['Physical (L1)', 'Data Link (L2)', 'Network (L3)', 'Transport (L4)'], correct: 1 },
+      { q: 'TCP dan UDP berada di layer OSI mana?', options: ['Network (L3)', 'Transport (L4)', 'Session (L5)', 'Presentation (L6)'], correct: 1 },
+      { q: 'Layer Physical (L1) OSI bertanggung jawab untuk apa?', options: ['Routing IP', 'MAC addressing', 'Bit transmission (sinyal fisik)', 'Enkripsi data'], correct: 2 },
+      { q: 'Switch bekerja di layer OSI mana?', options: ['L1 Physical', 'L2 Data Link', 'L3 Network', 'L4 Transport'], correct: 1 },
+      { q: 'Router bekerja di layer OSI mana?', options: ['L1 Physical', 'L2 Data Link', 'L3 Network', 'L4 Transport'], correct: 2 },
+      { q: 'Layer Presentation (L6) bertanggung jawab untuk apa?', options: ['Routing', 'Enkripsi dan format data', 'Koneksi fisik', 'Flow control'], correct: 1 },
+      { q: 'IP Address beroperasi di layer OSI mana?', options: ['L2 Data Link', 'L3 Network', 'L4 Transport', 'L5 Session'], correct: 1 },
+      { q: 'SSL/TLS berada di layer OSI mana?', options: ['L4 Transport', 'L5 Session', 'L6 Presentation', 'L7 Application'], correct: 2 },
+      { q: 'Port 20 digunakan untuk apa dalam FTP?', options: ['FTP Control', 'FTP Data Transfer', 'FTP Authentication', 'FTP Passive Mode'], correct: 1 },
+      { q: 'Protocol apa yang berjalan di port 123?', options: ['SNMP', 'NTP', 'DNS', 'LDAP'], correct: 1 },
+      { q: 'PDU di layer Transport disebut apa?', options: ['Bit', 'Frame', 'Packet', 'Segment'], correct: 3 },
+      { q: 'PDU di layer Data Link disebut apa?', options: ['Bit', 'Frame', 'Packet', 'Segment'], correct: 1 },
+      { q: 'PDU di layer Network disebut apa?', options: ['Bit', 'Frame', 'Packet', 'Segment'], correct: 2 },
+      { q: 'Port 8080 biasanya digunakan untuk?', options: ['MySQL', 'HTTP Alternatif / Proxy', 'SSH', 'FTP'], correct: 1 },
+      { q: 'Protokol ICMP digunakan untuk?', options: ['Transfer file', 'Diagnostic dan error reporting', 'Email', 'Remote desktop'], correct: 1 },
+      { q: 'ARP digunakan untuk memetakan apa?', options: ['IP ke domain', 'IP ke MAC address', 'MAC ke port', 'Domain ke IP'], correct: 1 }
+    ];
+
+    let quizState = {
+      active: false,
+      questions: [],
+      currentIndex: 0,
+      score: 0,
+      combo: 1,
+      comboCount: 0,
+      streak: 0,
+      timeLeft: 10,
+      timerInterval: null,
+      answered: false
+    };
+
+    function quizShuffleArray(arr) {
+      const a = [...arr];
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    function quizLoadQuestion() {
+      const q = quizState.questions[quizState.currentIndex];
+      document.getElementById('quiz-question').textContent = q.q;
+      document.getElementById('quiz-qnum').textContent = (quizState.currentIndex + 1) + '/20';
+      document.getElementById('quiz-streak').textContent = quizState.streak;
+      document.getElementById('quiz-combo').textContent = 'x' + quizState.combo;
+      quizState.answered = false;
+      quizState.timeLeft = 10;
+      document.getElementById('quiz-timer-val').textContent = '10';
+      document.getElementById('quiz-timer-fill').style.width = '100%';
+      document.getElementById('quiz-timer-fill').style.background = 'var(--cyan)';
+
+      const optContainer = document.getElementById('quiz-options');
+      optContainer.innerHTML = '';
+      const keys = ['A', 'B', 'C', 'D'];
+      q.options.forEach((opt, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'quiz-opt';
+        btn.disabled = false;
+        const keySpan = document.createElement('span');
+        keySpan.className = 'opt-key';
+        keySpan.textContent = keys[i];
+        btn.appendChild(keySpan);
+        btn.appendChild(document.createTextNode(opt));
+        btn.addEventListener('click', () => quizHandleAnswer(i));
+        optContainer.appendChild(btn);
+      });
+    }
+
+    function quizHandleAnswer(selected) {
+      if (!quizState.active || quizState.answered) return;
+      quizState.answered = true;
+      if (quizState.timerInterval) clearInterval(quizState.timerInterval);
+
+      const q = quizState.questions[quizState.currentIndex];
+      const opts = document.querySelectorAll('.quiz-opt');
+      opts.forEach(b => b.disabled = true);
+      if (q && opts[q.correct]) {
+        opts[q.correct].classList.add('correct');
+      }
+
+      if (q && selected === q.correct) {
+        playSound('success');
+        quizState.comboCount++;
+        if (quizState.comboCount >= 5) quizState.combo = 3;
+        else if (quizState.comboCount >= 3) quizState.combo = 2;
+        else quizState.combo = 1;
+        quizState.streak++;
+        const xpGain = 50 * quizState.combo;
+        quizState.score += xpGain;
+        addXP(xpGain);
+        document.getElementById('quiz-score').textContent = quizState.score;
+        document.getElementById('quiz-combo').textContent = 'x' + quizState.combo;
+        document.getElementById('quiz-streak').textContent = quizState.streak;
+        if (quizState.streak >= 10) checkAchievement('quiz_ace');
+      } else {
+        if (selected >= 0 && opts[selected]) {
+          opts[selected].classList.add('wrong');
+        }
+        playSound('error');
+        quizState.comboCount = 0;
+        quizState.combo = 1;
+        quizState.streak = 0;
+        document.getElementById('quiz-combo').textContent = 'x1';
+        document.getElementById('quiz-streak').textContent = '0';
+      }
+
+      safeSetTimeout(() => {
+        quizState.currentIndex++;
+        if (quizState.currentIndex >= 20) {
+          quizEndGame();
+        } else {
+          quizLoadQuestion();
+          quizStartTimer();
+        }
+      }, 1200);
+    }
+
+    function quizStartTimer() {
+      if (quizState.timerInterval) clearInterval(quizState.timerInterval);
+      quizState.timeLeft = 10;
+      quizState.timerInterval = safeSetInterval(() => {
+        quizState.timeLeft--;
+        document.getElementById('quiz-timer-val').textContent = quizState.timeLeft;
+        const pct = (quizState.timeLeft / 10) * 100;
+        document.getElementById('quiz-timer-fill').style.width = pct + '%';
+        if (quizState.timeLeft <= 3) {
+          document.getElementById('quiz-timer-fill').style.background = 'var(--red)';
+          playSound('packet');
+        }
+        if (quizState.timeLeft <= 0) {
+          clearInterval(quizState.timerInterval);
+          if (!quizState.answered) {
+            quizHandleAnswer(-1);
+          }
+        }
+      }, 1000);
+    }
+
+    function quizEndGame() {
+      clearAllTimers();
+      quizState.active = false;
+      document.getElementById('quiz-game').style.display = 'none';
+      document.getElementById('quiz-summary').classList.add('visible');
+      document.getElementById('quiz-final-score').textContent = quizState.score;
+      const grade = quizState.score >= 800 ? 'Luar biasa!' : quizState.score >= 500 ? 'Bagus!' : quizState.score >= 300 ? 'Cukup baik.' : 'Perlu latihan lagi.';
+      document.getElementById('quiz-final-desc').textContent = grade + ' XP earned: ' + quizState.score;
+      if (quizState.score > state.highScores.quiz) {
+        state.highScores.quiz = quizState.score;
+        saveState();
+      }
+      checkAchievement('first_blood');
+      playSound('levelup');
+    }
+
+    function quizInit() {
+      quizState.active = true;
+      quizState.questions = quizShuffleArray(QUIZ_QUESTIONS).slice(0, 20);
+      quizState.currentIndex = 0;
+      quizState.score = 0;
+      quizState.combo = 1;
+      quizState.comboCount = 0;
+      quizState.streak = 0;
+      quizState.answered = false;
+      document.getElementById('quiz-score').textContent = '0';
+      document.getElementById('quiz-combo').textContent = 'x1';
+      document.getElementById('quiz-streak').textContent = '0';
+      document.getElementById('quiz-summary').classList.remove('visible');
+      document.getElementById('quiz-game').style.display = 'block';
+      quizLoadQuestion();
+      quizStartTimer();
+    }
+
+    function quizKeyHandler(e) {
+      if (currentTab !== 'quiz' || !quizState.active || quizState.answered) return;
+      const tag = (e.target && e.target.tagName) ? e.target.tagName.toLowerCase() : '';
+      if (tag === 'input' || tag === 'textarea') return;
+      const keyMap = { '1': 0, '2': 1, '3': 2, '4': 3, 'a': 0, 'b': 1, 'c': 2, 'd': 3, 'A': 0, 'B': 1, 'C': 2, 'D': 3 };
+      if (keyMap[e.key] !== undefined) {
+        e.preventDefault();
+        quizHandleAnswer(keyMap[e.key]);
+      }
+    }
+
+    document.addEventListener('keydown', quizKeyHandler);
+
+    document.getElementById('quiz-start-btn').addEventListener('click', () => {
+      document.getElementById('quiz-start').style.display = 'none';
+      quizInit();
+    });
+
+    document.getElementById('quiz-restart-btn').addEventListener('click', () => {
+      document.getElementById('quiz-summary').classList.remove('visible');
+      quizInit();
+    });
+
+    // ============================================================
+    //  SETTINGS MODAL
+    // ============================================================
+    function openSettingsModal() {
+      const modal = document.getElementById('settings-modal');
+      modal.classList.add('visible');
+      const stats = document.getElementById('modal-stats');
+      const lv = getLevelInfo(state.xp);
+      stats.innerHTML =
+        '<div class="modal-stat-row"><span class="modal-stat-label">Level</span><span class="modal-stat-val">' + lv.name + '</span></div>' +
+        '<div class="modal-stat-row"><span class="modal-stat-label">Total XP</span><span class="modal-stat-val">' + state.xp + '</span></div>' +
+        '<div class="modal-stat-row"><span class="modal-stat-label">Total Skor</span><span class="modal-stat-val">' + state.totalScore + '</span></div>' +
+        '<div class="modal-stat-row"><span class="modal-stat-label">Streak</span><span class="modal-stat-val">' + state.streak + '</span></div>' +
+        '<div class="modal-stat-row"><span class="modal-stat-label">Pencapaian</span><span class="modal-stat-val">' + state.achievements.length + '/' + ACHIEVEMENTS_DEF.length + '</span></div>' +
+        '<div class="modal-stat-row"><span class="modal-stat-label">High Score CLI</span><span class="modal-stat-val">' + state.highScores.cli + '</span></div>' +
+        '<div class="modal-stat-row"><span class="modal-stat-label">High Score Subnet</span><span class="modal-stat-val">' + state.highScores.subnetting + '</span></div>' +
+        '<div class="modal-stat-row"><span class="modal-stat-label">High Score Quiz</span><span class="modal-stat-val">' + state.highScores.quiz + '</span></div>';
+      document.getElementById('reset-confirm-input').value = '';
+      document.getElementById('modal-reset-btn').disabled = true;
+    }
+
+    function closeSettingsModal() {
+      document.getElementById('settings-modal').classList.remove('visible');
+    }
+
+    document.getElementById('btn-settings').addEventListener('click', openSettingsModal);
+    document.getElementById('modal-close-btn').addEventListener('click', closeSettingsModal);
+    document.getElementById('settings-modal').addEventListener('click', (e) => {
+      if (e.target === document.getElementById('settings-modal')) closeSettingsModal();
+    });
+
+    document.getElementById('reset-confirm-input').addEventListener('input', (e) => {
+      document.getElementById('modal-reset-btn').disabled = e.target.value.trim() !== 'RESET';
+    });
+
+    document.getElementById('modal-reset-btn').addEventListener('click', () => {
+      try { localStorage.removeItem(STORAGE_KEY); } catch (e) { }
+      location.reload();
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeSettingsModal();
+    });
+
+    // ============================================================
+    //  MUTE BUTTON
+    // ============================================================
+    document.getElementById('btn-mute').addEventListener('click', () => {
+      state.muted = !state.muted;
+      saveState();
+      updateHeader();
+      playSound('click');
+    });
+
+    // ============================================================
+    //  ACHIEVEMENTS TOGGLE
+    // ============================================================
+    document.getElementById('achievements-toggle').addEventListener('click', () => {
+      const grid = document.getElementById('achievements-grid');
+      const icon = document.getElementById('ach-toggle-icon');
+      const isVisible = grid.classList.toggle('visible');
+      icon.textContent = isVisible ? '▲' : '▼';
+      document.getElementById('achievements-toggle').setAttribute('aria-expanded', isVisible ? 'true' : 'false');
+    });
+
+    // ============================================================
+    //  INIT
+    // ============================================================
+    loadState();
+    updateHeader();
+    renderAchievements();
+  </script>
+</body>
+
+</html>
